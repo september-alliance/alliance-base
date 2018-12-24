@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>alliance-core</artifactId>
+	<packaging>jar</packaging>
+
+	<name>alliance-core</name>
+	<description>A base and common lib for alliance stack </description>
+
+	<parent>
+		<groupId>org.september</groupId>
+		<artifactId>alliance-parent</artifactId>
+		<version>2.1.1-SNAPSHOT</version>
+	</parent>
+	<properties>
+	</properties>
+
+	<dependencies>
+		<dependency>
+		    <groupId>com.alibaba</groupId>
+		    <artifactId>fastjson</artifactId>
+		    <version>1.2.51</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>commons-io</groupId>
+		    <artifactId>commons-io</artifactId>
+		    <version>2.6</version>
+		</dependency>
+		
+	</dependencies>
+
+	<build>
+    </build>
+</project>

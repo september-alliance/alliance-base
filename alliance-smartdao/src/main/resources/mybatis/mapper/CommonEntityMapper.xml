@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CommonEntityMapper">
+
+    <select id="getById" parameterType="Object" resultType="Map">
+		select * from ${tableName} where ${idColumn}=#{idValue}
+	</select>
+
+    <!-- 单表等于查询 -->
+    <select id="listByExample" parameterType="org.september.smartdao.model.ParamMap" resultType="Map">
+        select * from ${tableName}
+        <where>
+            <foreach collection="queryPairList" item="queryPair" index="index" separator=" and ">
+                ${queryPair.columnName}=#{queryPair.columnValue}
+            </foreach>
+        </where>
+        <if test="orders != null and orders.size()>0">
+            ORDER BY
+            <foreach collection="orders" item="item" index="index1" separator=",">
+                ${item.property} ${item.direction}
+            </foreach>
+        </if>
+
+    </select>
+
+
+    <!-- 根据字段更新 -->
+    <select id="updateByField" parameterType="org.september.smartdao.model.ParamMap" resultType="Map">
+        update ${tableName} set
+        <foreach collection="columnList" item="column" index="index" separator=",">
+            ${column.name}=#{column.value}
+        </foreach>
+        where ${fieldName}=#{fieldValue}
+    </select>
+
+    <select id="selectId" resultType="Long">
+		${selectKey}
+	</select>
+
+    <select id="batchInsertBySequence" parameterType="org.september.smartdao.model.ParamMap" resultType="Map">
+        <!--  insert into ${tableName} (id,-->
+        insert into ${tableName} (
+        <foreach collection="columns" item="column" index="index1" separator=",">${column}</foreach>
+        )values
+        <foreach collection="rows" item="row" index="index2" separator=",">
+            ( (select next value for mycatseq_global as id),
+            <foreach collection="row" item="colVal" index="index3" separator=",">#{colVal}</foreach>
+            )
+        </foreach>
+    </select>
+    
+    <select id="batchInsertAutoIncrease" parameterType="org.september.smartdao.model.ParamMap" resultType="Map">
+        <!--  insert into ${tableName} (id,-->
+        insert into ${tableName} (
+        <foreach collection="columns" item="column" index="index1" separator=",">${column}</foreach>
+        )values
+        <foreach collection="rows" item="row" index="index2" separator=",">
+            (
+            <foreach collection="row" item="colVal" index="index3" separator=",">#{colVal}</foreach>
+            )
+        </foreach>
+    </select>
+    
+    <insert id="insertEntityAutoIncrease" parameterType="org.september.smartdao.model.ParamMap">
+        <selectKey resultType="java.lang.Long" keyProperty="id"      order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into ${tableName} (id,
+        <foreach collection="queryPairList" item="queryPair" index="index1" separator=",">
+            ${queryPair.columnName}
+        </foreach>
+        )values(#{id,jdbcType=BIGINT},
+        <foreach collection="queryPairList" item="queryPair" index="index3" separator=",">
+            #{queryPair.columnValue}
+        </foreach>
+        )
+    </insert>
+    
+    <insert id="insertEntityWithSequence" parameterType="org.september.smartdao.model.ParamMap">
+        <selectKey resultType="java.lang.Long" keyProperty="id"      order="BEFORE">
+            select next value for mycatseq_global as id
+        </selectKey>
+        insert into ${tableName} (id,
+        <foreach collection="queryPairList" item="queryPair" index="index1" separator=",">
+            ${queryPair.columnName}
+        </foreach>
+        )values(#{id,jdbcType=BIGINT},
+        <foreach collection="queryPairList" item="queryPair" index="index3" separator=",">
+            #{queryPair.columnValue}
+        </foreach>
+        )
+    </insert>
+    
+    <insert id="insertEntityWithId" parameterType="org.september.smartdao.model.ParamMap">
+        insert into ${tableName} (
+        <foreach collection="queryPairList" item="queryPair" index="index1" separator=",">
+            ${queryPair.columnName}
+        </foreach>
+        )values(
+        <foreach collection="queryPairList" item="queryPair" index="index3" separator=",">
+            #{queryPair.columnValue}
+        </foreach>
+        )
+    </insert>
+
+    <!--通过id删除-->
+    <delete id="deleteById" parameterType="org.september.smartdao.model.ParamMap">
+		delete from ${tableName} where  ${idColumn}=#{idValue}
+	</delete>
+
+    <!-- 批量删除 -->
+    <delete id="deleteByIds" parameterType="org.september.smartdao.model.ParamMap">
+        delete from ${tableName} where ${idColumn} in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--通过id更新-->
+    <update id="updateEntityById" parameterType="org.september.smartdao.model.ParamMap">
+        UPDATE ${tableName}
+        <set>
+            <foreach collection="queryPairList" item="queryPair" index="index" separator=" and ">
+                ${queryPair.columnName}=#{queryPair.columnValue}
+            </foreach>
+        </set>
+        <where>
+            ${idColumn}=#{idValue}
+        </where>
+    </update>
+
+    <select id="findPage" parameterType="org.september.smartdao.model.ParamMap" resultType="Map">
+        SELECT * FROM ${tableName}
+        <where>
+            <foreach collection="queryPairList" item="queryPair" index="index" separator=" and ">
+                ${queryPair.columnName}=#{queryPair.columnValue}
+            </foreach>
+        </where>
+    </select>
+    
+    <!-- 根据字段统计梳理 -->
+	<select id="countByExample" parameterType="ParamMap" resultType="Long">
+		select count(*) from ${tableName}
+		<where>
+			<foreach collection="columnList" item="column" index="index" separator="and"> ${column.name}=#{column.value} </foreach>
+		</where>
+	</select>
+</mapper>
