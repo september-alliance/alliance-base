@@ -17,6 +17,6 @@ public @interface Sequence {
     /**
      * 产生id的函数名称
      */
-	String name() default "MYCAT_SEQ_NEXTVAL";
+	String selectKey();
 	
 }

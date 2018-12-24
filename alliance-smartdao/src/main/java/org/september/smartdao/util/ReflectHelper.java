@@ -20,8 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.ReflectionUtils;
 
-import com.alibaba.fastjson.JSONObject;
-
 /**
  * 说明：反射工具
  * <p>
@@ -30,23 +28,6 @@ import com.alibaba.fastjson.JSONObject;
 public class ReflectHelper {
     private static final Logger logger = LoggerFactory.getLogger(ReflectHelper.class);
 
-    public static Map transformEntityToMap(Object obj) {
-        Map map = new HashMap();
-        for (Field f : obj.getClass().getDeclaredFields()) {
-            f.setAccessible(true);
-            try {
-                Object value = f.get(obj);
-                if(value==null){
-                	continue;
-                }
-                map.put(f.getName(), value);
-            } catch (Exception e) {
-                logger.warn("get " + f.getName() + " value of " + obj.getClass().getName() + " failed ");
-            }
-        }
-        return map;
-    }
-    
     public static Map transEmptyString2Null(Object obj) {
         Map map = new HashMap();
         for (Field f : obj.getClass().getDeclaredFields()) {
@@ -57,7 +38,7 @@ public class ReflectHelper {
                 	continue;
                 }
                 if("".equals(value)){
-                	map.compute(f.getName(), null);
+                	map.put(f.getName(), null);
                 }else{
                 	map.put(f.getName(), value);
                 }
@@ -73,7 +54,7 @@ public class ReflectHelper {
         for (Map map : mapResult) {
             try {
                 T entity = clazz.newInstance();
-                ReflectHelper.setProperties(entity, map);
+                setProperties(entity, map);
                 entityResult.add(entity);
             } catch (InstantiationException | IllegalAccessException e) {
                 throw new RuntimeException("try to wrap entity " + clazz.getName() + " failed", e);
@@ -95,7 +76,6 @@ public class ReflectHelper {
 
 
         for (Field field : fieldList) {
-//			String name = field.getName().toUpperCase();
             String name = field.getName();
             Object value = origin.get(name);
             if (value == null) {
@@ -133,28 +113,10 @@ public class ReflectHelper {
                     Timestamp timestamp = (Timestamp) value;
                     field.set(dest, OffsetDateTime.ofInstant(timestamp.toInstant(), ZoneId.systemDefault()));
                     /**------------------end--------------------*/
-                } else if (field.getType().equals(JSONObject.class)) {
-                    JSONObject json = null;
-
-                    if (value.getClass() == byte[].class) {
-                        json = JSONObject.parseObject(new String(((byte[]) value)));
-                    } else {
-                        json = JSONObject.parseObject(value.toString());
-                    }
-                    field.set(dest, json);
-                    /**------------------end--------------------*/
-                } else {
-                    if (field.getType().equals(Short.class)) {
-                        field.set(dest, Short.valueOf(value.toString()));
-                    } else {
-                        /**处理对于mysql 虚拟返回列值的处理 2018-04-28　fan create by*/
-                        if (value.getClass() == byte[].class) {
-                            field.set(dest, new String(((byte[]) value)));
-                            /**------------------end--------------------*/
-                        } else {
-                            field.set(dest, value);
-                        }
-                    }
+                }else if (field.getType().equals(Short.class)) {
+                    field.set(dest, Short.valueOf(value.toString()));
+                }else {
+                    field.set(dest, value);
                 }
 
             }
@@ -173,73 +135,4 @@ public class ReflectHelper {
             throw new RuntimeException("try to wrap entity " + clazz.getName() + " failed", e);
         }
     }
-
-    /**
-     * 获取obj对象fieldName的属性值
-     *
-     * @param obj
-     * @param fieldName
-     * @return
-     * @throws SecurityException
-     * @throws NoSuchFieldException
-     * @throws IllegalArgumentException
-     * @throws IllegalAccessException
-     */
-    public static Object getValueByFieldName(Object obj, String fieldName)
-            throws SecurityException, NoSuchFieldException,
-            IllegalArgumentException, IllegalAccessException {
-        Field field = getFieldByFieldName(obj, fieldName);
-        Object value = null;
-        if (field != null) {
-            if (field.isAccessible()) {
-                value = field.get(obj);
-            } else {
-                field.setAccessible(true);
-                value = field.get(obj);
-                field.setAccessible(false);
-            }
-        }
-        return value;
-    }
-
-    /**
-     * 获取obj对象fieldName的Field
-     *
-     * @param obj
-     * @param fieldName
-     * @return
-     */
-    public static Field getFieldByFieldName(Object obj, String fieldName) {
-        for (Class<?> superClass = obj.getClass(); superClass != Object.class; superClass = superClass
-                .getSuperclass()) {
-            try {
-                return superClass.getDeclaredField(fieldName);
-            } catch (NoSuchFieldException e) {
-            }
-        }
-        return null;
-    }
-    
-    /**
-	 * 设置obj对象fieldName的属性值
-	 * @param obj
-	 * @param fieldName
-	 * @param value
-	 * @throws SecurityException
-	 * @throws NoSuchFieldException
-	 * @throws IllegalArgumentException
-	 * @throws IllegalAccessException
-	 */
-	public static void setValueByFieldName(Object obj, String fieldName,
-			Object value) throws SecurityException, NoSuchFieldException,
-			IllegalArgumentException, IllegalAccessException {
-		Field field = getFieldByFieldName(obj, fieldName);
-		if (field.isAccessible()) {
-			field.set(obj, value);
-		} else {
-			field.setAccessible(true);
-			field.set(obj, value);
-			field.setAccessible(false);
-		}
-	}
 }

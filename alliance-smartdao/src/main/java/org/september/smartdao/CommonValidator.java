@@ -7,6 +7,7 @@ import org.september.smartdao.util.ReflectHelper;
 import org.september.smartdao.util.SqlHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ReflectionUtils;
 
 @Component
 public class CommonValidator {
@@ -28,7 +29,7 @@ public class CommonValidator {
         try {
             obj = clazz.newInstance();
             for(int i=0;i<fields.length;i++){
-                ReflectHelper.setValueByFieldName(obj, fields[i], values[i]);
+            	ReflectionUtils.setField(ReflectionUtils.findField(clazz, fields[i]), obj, values[i]);
             }
             Object po = commonDao.getByExample(obj);
             if(po==null){
@@ -47,14 +48,14 @@ public class CommonValidator {
         try {
             obj = clazz.newInstance();
             for(int i=0;i<fields.length;i++){
-                ReflectHelper.setValueByFieldName(obj, fields[i], values[i]);
+            	ReflectionUtils.setField(ReflectionUtils.findField(clazz, fields[i]), obj, values[i]);
             }
             Object po = commonDao.getByExample(obj);
             if(po==null){
             	return false;
             }
             Field idField = SqlHelper.getIdOfClass(clazz);
-            Object poIdValue = ReflectHelper.getValueByFieldName(po, idField.getName());
+            Object poIdValue = ReflectionUtils.getField(idField, po);
             if(!poIdValue.equals(myId)){
             	return true;
             }else{

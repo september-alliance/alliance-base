@@ -67,11 +67,11 @@
             SELECT LAST_INSERT_ID()
         </selectKey>
         insert into ${tableName} (id,
-        <foreach collection="queryPairList" item="queryPair" index="index1" separator=",">
+        <foreach collection="columnList" item="queryPair" index="index1" separator=",">
             ${queryPair.columnName}
         </foreach>
         )values(#{id,jdbcType=BIGINT},
-        <foreach collection="queryPairList" item="queryPair" index="index3" separator=",">
+        <foreach collection="columnList" item="queryPair" index="index3" separator=",">
             #{queryPair.columnValue}
         </foreach>
         )
@@ -79,14 +79,14 @@
     
     <insert id="insertEntityWithSequence" parameterType="org.september.smartdao.model.ParamMap">
         <selectKey resultType="java.lang.Long" keyProperty="id"      order="BEFORE">
-            select next value for mycatseq_global as id
+            select ${selectKey} as id
         </selectKey>
         insert into ${tableName} (id,
-        <foreach collection="queryPairList" item="queryPair" index="index1" separator=",">
+        <foreach collection="columnList" item="queryPair" index="index1" separator=",">
             ${queryPair.columnName}
         </foreach>
         )values(#{id,jdbcType=BIGINT},
-        <foreach collection="queryPairList" item="queryPair" index="index3" separator=",">
+        <foreach collection="columnList" item="queryPair" index="index3" separator=",">
             #{queryPair.columnValue}
         </foreach>
         )
@@ -94,11 +94,11 @@
     
     <insert id="insertEntityWithId" parameterType="org.september.smartdao.model.ParamMap">
         insert into ${tableName} (
-        <foreach collection="queryPairList" item="queryPair" index="index1" separator=",">
+        <foreach collection="columnList" item="queryPair" index="index1" separator=",">
             ${queryPair.columnName}
         </foreach>
         )values(
-        <foreach collection="queryPairList" item="queryPair" index="index3" separator=",">
+        <foreach collection="columnList" item="queryPair" index="index3" separator=",">
             #{queryPair.columnValue}
         </foreach>
         )

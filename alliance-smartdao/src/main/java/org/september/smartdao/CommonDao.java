@@ -2,7 +2,6 @@ package org.september.smartdao;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,10 +9,10 @@ import java.util.Map;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.mybatis.spring.SqlSessionTemplate;
+import org.september.core.exception.BusinessException;
 import org.september.smartdao.anno.AutoIncrease;
 import org.september.smartdao.anno.Sequence;
 import org.september.smartdao.datasource.SmartDatasourceHolder;
-import org.september.smartdao.model.DuplicateValueException;
 import org.september.smartdao.model.Order;
 import org.september.smartdao.model.Page;
 import org.september.smartdao.model.ParamMap;
@@ -21,7 +20,6 @@ import org.september.smartdao.model.QueryPair;
 import org.september.smartdao.util.ReflectHelper;
 import org.september.smartdao.util.SqlHelper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Component;
 
 import com.github.pagehelper.PageHelper;
@@ -43,13 +41,16 @@ public class CommonDao {
         	SmartDatasourceHolder.switchToWrite();
             List<QueryPair> queryPairList = SqlHelper.getQueryPairs(entity);
             ParamMap pm = new ParamMap();
-            pm.put("queryPairList", queryPairList);
+            pm.put("columnList", queryPairList);
             pm.put("tableName", SqlHelper.getTableName(entity.getClass()));
             String keyName =SqlHelper.getIdOfClass(entity.getClass()).getName();
             Sequence seq = SqlHelper.getIdOfClass(entity.getClass()).getAnnotation(Sequence.class);
             AutoIncrease auto = SqlHelper.getIdOfClass(entity.getClass()).getAnnotation(AutoIncrease.class);
             if(seq!=null) {
+            	pm.put("selectKey", seq.selectKey());
                 sqlSessionTemplate.insert("CommonEntityMapper.insertEntityWithSequence", pm);
+                long id = (long) pm.get("id");
+                BeanUtils.setProperty(entity,  keyName, id);
             }else if (auto!=null){
             	sqlSessionTemplate.insert("CommonEntityMapper.insertEntityAutoIncrease", pm);
             	long id = (long) pm.get("id");
@@ -58,17 +59,8 @@ public class CommonDao {
             	sqlSessionTemplate.insert("CommonEntityMapper.insertEntityWithId", pm);
             }
             
-        } catch(DuplicateKeyException ex){
-        	// TODO 找到字段名称
-        	throw new DuplicateValueException("重复的字段", ex.getCause().getMessage().split(" ")[2], ex);
         }catch (Exception e) {
-        	if(e.getCause() instanceof SQLException) {
-        		SQLException sqlEx = (SQLException)e.getCause();
-        		if(sqlEx.getErrorCode()==1364) {
-        			throw new RuntimeException(sqlEx.getMessage());
-        		}
-        	}
-            throw new RuntimeException(e);
+            throw new BusinessException("保存数据失败",e);
         }
     }
 
@@ -79,19 +71,21 @@ public class CommonDao {
      */
     public void update(Object entity) {
         try {
-        	 SmartDatasourceHolder.switchToWrite();
+        	SmartDatasourceHolder.switchToWrite();
             // 得到类中属性id
             Field id = SqlHelper.getIdOfEntity(entity);
             id.setAccessible(true);
             if (id != null) {
                 Object val = id.get(entity);
                 if (val == null) {
-                    throw new RuntimeException("id can't be null when update");
+                    throw new BusinessException("id can't be null when update");
                 }
                 this.updateByField(entity.getClass(), id.getName(), val, entity , false);
             }
-        } catch (IllegalAccessException e) {
+        }catch (IllegalAccessException e) {
             throw new RuntimeException(e);
+        }catch (Exception e) {
+            throw new BusinessException("更新数据失败",e);
         }
     }
 
@@ -108,8 +102,10 @@ public class CommonDao {
                 }
                 this.updateByField(entity.getClass(), id.getName(), val, entity , true);
             }
-        } catch (IllegalAccessException e) {
+        }catch (IllegalAccessException e) {
             throw new RuntimeException(e);
+        }catch (Exception e) {
+            throw new BusinessException("更新数据失败",e);
         }
     }
     
@@ -119,7 +115,7 @@ public class CommonDao {
      * @date 2017/12/22
      */
     public int deleteByIds(Class<?> clazz, List<Object> ids) {
-    	 SmartDatasourceHolder.switchToWrite();
+    	SmartDatasourceHolder.switchToWrite();
         ParamMap pm = new ParamMap();
         pm.put("idColumn", SqlHelper.getIdColumnOfClass(clazz));
         pm.put("tableName", SqlHelper.getTableName(clazz));
@@ -133,7 +129,7 @@ public class CommonDao {
      * @date 2017/12/22
      */
     public void delete(Object entity) {
-    	 SmartDatasourceHolder.switchToWrite();
+    	SmartDatasourceHolder.switchToWrite();
         ParamMap pm = new ParamMap();
         Field[] fields = entity.getClass().getDeclaredFields();
         for (Field field : fields) {
@@ -155,13 +151,7 @@ public class CommonDao {
     	if(id==null) {
     		return null;
     	}
-    	SmartDatasourceHolder.switchToRead();
-        String tableName = SqlHelper.getTableName(clazz);
-        ParamMap pm = new ParamMap();
-        pm.put("tableName", tableName);
-        pm.put("idColumn", SqlHelper.getIdColumnOfClass(clazz));
-        pm.put("idValue", id);
-        Map map = sqlSessionTemplate.selectOne("CommonEntityMapper.getById", pm);
+        Map map = getAsMap(clazz , id);
         T result = ReflectHelper.transformMapToEntity(clazz, map);
         return result;
     }
@@ -284,9 +274,6 @@ public class CommonDao {
         paramMap.put("tableName", tableName);
         paramMap.put("queryPairList", queryPairs);
         paramMap.put("page", page);
-        if (example == null) {
-            throw new RuntimeException("example can not be null when findPageByExample");
-        }
         com.github.pagehelper.Page<T> innerPage = PageHelper.startPage(page.getCurrentPage(), page.getPageSize());
         List<Map> mapResult = sqlSessionTemplate.selectList("CommonEntityMapper.findPage", paramMap);
         List<?> entityResult = ReflectHelper.transformMapToEntity(clazz, mapResult);
@@ -310,7 +297,6 @@ public class CommonDao {
             com.github.pagehelper.Page<T> innerPage = PageHelper.startPage(page.getCurrentPage(), page.getPageSize());
             List<T> resultLists = listByParams(clazz, statement, paramMap);
             PageInfo<T> pageInfo = innerPage.toPageInfo();
-//            PageInfo pageInfo = new PageInfo(resultLists);
             page.setResult(resultLists);
             // setTotalResult 总的结果数
             page.setTotalResult((int) pageInfo.getTotal());
@@ -398,14 +384,10 @@ public class CommonDao {
             columns.add(column);
         }
         ParamMap pm = new ParamMap();
-        try {
-            pm.put("tableName", tableName);
-            pm.put("fieldName", whereColumnName);
-            pm.put("fieldValue", fieldValue);
-            pm.put("columnList", columns);
-        } catch (Exception e) {
-           throw new RuntimeException(e);
-        }
+        pm.put("tableName", tableName);
+        pm.put("fieldName", whereColumnName);
+        pm.put("fieldValue", fieldValue);
+        pm.put("columnList", columns);
         int result = this.execute("CommonEntityMapper.updateByField", pm);
         return result;
     }
@@ -464,13 +446,7 @@ public class CommonDao {
                 if (seqAno == null) {
                     // 业务赋值，走下面try方法
                 } else {
-                    // 默认用MYCAT_SEQ_NEXTVAL
-                	//TODO 换成mycatseq_global
-                    String tableName = SqlHelper.getTableName(obj.getClass());
-                    String selectKey = "select  " + seqAno.name() + "('" + tableName + "')";
-//                    if (seqAno.isSharding()) {
-//                        selectKey = "select next value for MYCATSEQ_" + tableName;
-//                    }
+                    String selectKey = seqAno.selectKey();
                     ParamMap pm = new ParamMap();
                     pm.put("selectKey", selectKey);
                     Long id = sqlSessionTemplate.selectOne("CommonEntityMapper.selectId", pm);
@@ -483,7 +459,7 @@ public class CommonDao {
                 Object val = fields[i].get(obj);
                 values.add(val);
             } catch (Exception e) {
-                throw new RuntimeException("批量插入数据失败", e);
+                throw new BusinessException("批量插入数据失败", e);
             }
         }
         return values;

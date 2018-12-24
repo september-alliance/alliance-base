@@ -30,8 +30,11 @@ public class SqlHelper {
     }
 
     public static List<QueryPair> getQueryPairs(Object parameterObject) {
-        Field[] fields = parameterObject.getClass().getDeclaredFields();
-        List<QueryPair> result = new ArrayList<QueryPair>();
+    	List<QueryPair> result = new ArrayList<QueryPair>();
+    	if(parameterObject==null){
+    		return result;
+    	}
+    	Field[] fields = parameterObject.getClass().getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
             if (isTransientField(fields[i])) {
                 continue;

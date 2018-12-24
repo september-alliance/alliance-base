@@ -1,5 +1,6 @@
 package org.september.smartdao.test.service;
 
+import org.apache.ibatis.session.Configuration;
 import org.september.smartdao.config.MyBatisConfigManager;
 import org.springframework.stereotype.Component;
 
@@ -12,13 +13,13 @@ import org.springframework.stereotype.Component;
 public class TestMyBatisConfigManager implements MyBatisConfigManager {
 
 	@Override
-	public String getTypeAliasesPackage() {
-		return "org.september.smartdao.entity";
-	}
-
-	@Override
 	public String getMapperLocation() {
 		// 配置测试的mapper
 		return this.getClass().getResource("/")+"test/mybatis/mapper/**/*.xml";
+	}
+
+	@Override
+	public void config(Configuration myBatisCfg) {
+		
 	}
 }

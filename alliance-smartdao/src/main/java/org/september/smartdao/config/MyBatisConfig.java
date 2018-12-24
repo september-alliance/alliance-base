@@ -22,7 +22,6 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.TransactionManagementConfigurer;
-import org.springframework.util.StringUtils;
 
 import com.github.pagehelper.PageInterceptor;
 
@@ -38,11 +37,6 @@ public class MyBatisConfig implements TransactionManagementConfigurer {
     public SqlSessionFactory sqlSessionFactoryBean() {
         SqlSessionFactoryBean bean = new SqlSessionFactoryBean();
         bean.setDataSource(dataSource);
-        if (myBatisConfigManager != null) {
-        	if(!StringUtils.isEmpty(myBatisConfigManager.getTypeAliasesPackage())){
-        		bean.setTypeAliasesPackage(myBatisConfigManager.getTypeAliasesPackage());
-        	}
-        }
         ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 
         org.apache.ibatis.session.Configuration configuration = new org.apache.ibatis.session.Configuration();
@@ -54,6 +48,9 @@ public class MyBatisConfig implements TransactionManagementConfigurer {
         configuration.setDefaultExecutorType(ExecutorType.REUSE);
         configuration.getTypeAliasRegistry().registerAlias("ParamMap", ParamMap.class);
         
+        if (myBatisConfigManager != null) {
+        	myBatisConfigManager.config(configuration);
+        }
         PageInterceptor pageInterceptor = new PageInterceptor();
         Properties prop = new Properties();
         prop.put("helperDialect", "mysql");
