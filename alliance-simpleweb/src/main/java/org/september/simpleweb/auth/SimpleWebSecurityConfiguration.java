@@ -96,8 +96,8 @@ public class SimpleWebSecurityConfiguration extends WebSecurityConfigurerAdapter
 						out.flush();
 						out.close();
 					}
-				}).loginProcessingUrl("/doLogin").permitAll() // 自定义的登录接口
-				.and().logout().permitAll()
+				}).loginProcessingUrl("/doLogin") // 自定义的登录接口
+				.and().logout().logoutUrl("/logout")
 				.and().exceptionHandling().defaultAuthenticationEntryPointFor(ajaxAuthenticationEntryPoint, new RequestMatcher() {
 					@Override
 				    public boolean matches(HttpServletRequest request) {
