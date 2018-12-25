@@ -151,15 +151,6 @@ public class CommonDao {
     	if(id==null) {
     		return null;
     	}
-        Map map = getAsMap(clazz , id);
-        T result = ReflectHelper.transformMapToEntity(clazz, map);
-        return result;
-    }
-    
-    public Map getAsMap(Class clazz , Object id) {
-    	if(id==null) {
-    		return null;
-    	}
     	SmartDatasourceHolder.switchToRead();
         String tableName = SqlHelper.getTableName(clazz);
         ParamMap pm = new ParamMap();
@@ -167,7 +158,8 @@ public class CommonDao {
         pm.put("idColumn", SqlHelper.getIdColumnOfClass(clazz));
         pm.put("idValue", id);
         Map map = sqlSessionTemplate.selectOne("CommonEntityMapper.getById", pm);
-        return map;
+        T result = ReflectHelper.transformMapToEntity(clazz, map);
+        return result;
     }
 
     /**
