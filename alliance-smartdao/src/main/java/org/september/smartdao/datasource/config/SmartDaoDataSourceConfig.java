@@ -50,7 +50,8 @@ public class SmartDaoDataSourceConfig {
 			ds.setPassword(dsp.getPassword());
 			ds.setMaxActive(dsp.getMaxActive());
 			ds.setInitialSize(dsp.getInitialSize());
-			ds.setTestWhileIdle(false);
+			ds.setTestOnBorrow(true);
+			ds.setValidationQuery("SELECT 1");
 			if(dsp.getType()!=null) {
 				if(dsp.getType().contains("read")) {
 					group.getReadDSList().add(ds);

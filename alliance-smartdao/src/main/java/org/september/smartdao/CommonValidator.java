@@ -29,7 +29,9 @@ public class CommonValidator {
         try {
             obj = clazz.newInstance();
             for(int i=0;i<fields.length;i++){
-            	ReflectionUtils.setField(ReflectionUtils.findField(clazz, fields[i]), obj, values[i]);
+            	Field field = ReflectionUtils.findField(clazz, fields[i]);
+            	field.setAccessible(true);
+            	ReflectionUtils.setField(field, obj, values[i]);
             }
             Object po = commonDao.getByExample(obj);
             if(po==null){
@@ -48,7 +50,9 @@ public class CommonValidator {
         try {
             obj = clazz.newInstance();
             for(int i=0;i<fields.length;i++){
-            	ReflectionUtils.setField(ReflectionUtils.findField(clazz, fields[i]), obj, values[i]);
+            	Field field = ReflectionUtils.findField(clazz, fields[i]);
+            	field.setAccessible(true);
+            	ReflectionUtils.setField(field, obj, values[i]);
             }
             Object po = commonDao.getByExample(obj);
             if(po==null){
