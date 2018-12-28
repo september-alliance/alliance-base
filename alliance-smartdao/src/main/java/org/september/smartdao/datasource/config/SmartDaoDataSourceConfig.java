@@ -48,10 +48,47 @@ public class SmartDaoDataSourceConfig {
 			ds.setDriverClassName(dsp.getDriverClass());
 			ds.setUsername(dsp.getUsername());
 			ds.setPassword(dsp.getPassword());
-			ds.setMaxActive(dsp.getMaxActive());
+			
+			ds.setAbandonWhenPercentageFull(dsp.getAbandonWhenPercentageFull());
+			ds.setAccessToUnderlyingConnectionAllowed(dsp.isAccessToUnderlyingConnectionAllowed());
+			ds.setAlternateUsernameAllowed(dsp.isAlternateUsernameAllowed());
+			ds.setCommitOnReturn(dsp.isCommitOnReturn());
+			ds.setDataSourceJNDI(dsp.getDataSourceJNDI());
+			ds.setDefaultAutoCommit(dsp.getDefaultAutoCommit());
+			ds.setDefaultReadOnly(dsp.getDefaultReadOnly());
+			ds.setDefaultTransactionIsolation(dsp.getDefaultTransactionIsolation());
+			ds.setFairQueue(dsp.isFairQueue());
+			ds.setIgnoreExceptionOnPreLoad(dsp.isIgnoreExceptionOnPreLoad());
 			ds.setInitialSize(dsp.getInitialSize());
-			ds.setTestOnBorrow(true);
-			ds.setValidationQuery("SELECT 1");
+			ds.setInitSQL(dsp.getInitSQL());
+			ds.setJdbcInterceptors(dsp.getJdbcInterceptors());
+			ds.setJmxEnabled(dsp.isJmxEnabled());
+			ds.setLogAbandoned(dsp.isLogAbandoned());
+			ds.setLogValidationErrors(dsp.isLogValidationErrors());
+			ds.setMaxActive(dsp.getMaxActive());
+			ds.setMaxAge(dsp.getMaxAge());
+			ds.setMaxIdle(dsp.getMaxIdle());
+			ds.setMaxWait(dsp.getMaxWait());
+			ds.setMinIdle(dsp.getMinIdle());
+			ds.setMinEvictableIdleTimeMillis(dsp.getMinEvictableIdleTimeMillis());
+			ds.setPropagateInterruptState(dsp.isPropagateInterruptState());
+			ds.setRemoveAbandoned(dsp.isRemoveAbandoned());
+			ds.setRemoveAbandonedTimeout(dsp.getRemoveAbandonedTimeout());
+			ds.setRollbackOnReturn(dsp.isRollbackOnReturn());
+			ds.setSuspectTimeout(dsp.getSuspectTimeout());
+			ds.setTestOnBorrow(dsp.isTestOnBorrow());
+			ds.setTestOnConnect(dsp.isTestOnConnect());
+			ds.setTestOnReturn(dsp.isTestOnReturn());
+			ds.setTestWhileIdle(dsp.isTestWhileIdle());
+			ds.setTimeBetweenEvictionRunsMillis(dsp.getTimeBetweenEvictionRunsMillis());
+			ds.setUseDisposableConnectionFacade(dsp.isUseDisposableConnectionFacade());
+			ds.setUseEquals(dsp.isUseEquals());
+			ds.setUseLock(dsp.isUseLock());
+			ds.setUseStatementFacade(dsp.isUseStatementFacade());
+			ds.setValidationQuery(dsp.getValidationQuery());
+			ds.setValidationInterval(dsp.getValidationInterval());
+			ds.setValidationQueryTimeout(dsp.getValidationQueryTimeout());
+			
 			if(dsp.getType()!=null) {
 				if(dsp.getType().contains("read")) {
 					group.getReadDSList().add(ds);

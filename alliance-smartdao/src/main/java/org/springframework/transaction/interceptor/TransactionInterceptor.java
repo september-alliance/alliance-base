@@ -66,11 +66,14 @@ public class TransactionInterceptor  extends TransactionAspectSupport implements
 		// add by xzye
 		// 事务只走写库
 		SmartDatasourceHolder.switchToWrite();
-		// lock datasource context
-		SmartDatasourceHolder.lockDataSource();
+		
+		// 其实在开始事务之前就已经确定了数据库，事务方法内不管有多少个读写方法都不会再选择数据库，所以没有必要
+		// lock 和 release datasource
+		
+//		SmartDatasourceHolder.lockDataSource(); // lock datasource context
 		Object result = invokeWithinTransaction(invocation.getMethod(), targetClass, invocation::proceed);
 		// release datasource context
-		SmartDatasourceHolder.releaseDataSourceLock();
+//		SmartDatasourceHolder.releaseDataSourceLock();
 		return result;
 	}
 

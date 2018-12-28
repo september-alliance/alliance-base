@@ -3,7 +3,6 @@ package org.september.smartdao;
 import java.lang.reflect.Field;
 
 import org.september.core.exception.BusinessException;
-import org.september.smartdao.util.ReflectHelper;
 import org.september.smartdao.util.SqlHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -59,6 +58,7 @@ public class CommonValidator {
             	return false;
             }
             Field idField = SqlHelper.getIdOfClass(clazz);
+            idField.setAccessible(true);
             Object poIdValue = ReflectionUtils.getField(idField, po);
             if(!poIdValue.equals(myId)){
             	return true;
