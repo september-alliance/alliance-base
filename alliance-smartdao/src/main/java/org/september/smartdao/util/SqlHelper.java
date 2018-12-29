@@ -3,6 +3,7 @@ package org.september.smartdao.util;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,12 +30,21 @@ public class SqlHelper {
         return tableName.toLowerCase();
     }
 
+    public static Field[] getAllDeclaredFields(Class<?> clazz) {
+    	List<Field> target = new ArrayList<>();
+    	while(clazz!=null && !clazz.equals(Object.class)) {
+    		target.addAll(Arrays.asList(clazz.getDeclaredFields()));
+    		clazz = clazz.getSuperclass();
+    	}
+    	return target.toArray(new Field[] {});
+    }
+    
     public static List<QueryPair> getQueryPairs(Object parameterObject) {
     	List<QueryPair> result = new ArrayList<QueryPair>();
     	if(parameterObject==null){
     		return result;
     	}
-    	Field[] fields = parameterObject.getClass().getDeclaredFields();
+    	Field[] fields = getAllDeclaredFields(parameterObject.getClass());
         for (int i = 0; i < fields.length; i++) {
             if (isTransientField(fields[i])) {
                 continue;
@@ -48,15 +58,18 @@ public class SqlHelper {
                 Object val = fields[i].get(parameterObject);
 
                 if (val != null) {
+                	QueryPair pair = new QueryPair();
                     if (val instanceof String) {
                         if (!"".equals(val)) {
-                            QueryPair pair = new QueryPair();
                             pair.setColumnName(getColumnName(fields[i]));
                             pair.setColumnValue(val);
                             result.add(pair);
                         }
-                    } else {
-                        QueryPair pair = new QueryPair();
+                    }else if (val instanceof Enum) {
+                        pair.setColumnName(getColumnName(fields[i]));
+                        pair.setColumnValue(((Enum)val).ordinal());
+                        result.add(pair);
+                    }  else {
                         pair.setColumnName(getColumnName(fields[i]));
                         pair.setColumnValue(val);
                         result.add(pair);
@@ -97,7 +110,7 @@ public class SqlHelper {
     }
 
     public static Field[] getFieldsWithoutTransient(Class<?> clazz) {
-        Field[] fields = clazz.getDeclaredFields();
+        Field[] fields = getAllDeclaredFields(clazz);
         List<Field> result = new ArrayList<Field>();
         for (int i = 0; i < fields.length; i++) {
             if (isTransientField(fields[i])) {

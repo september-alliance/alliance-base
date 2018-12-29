@@ -29,6 +29,9 @@ public class SmartDaoDataSourceConfig {
 	@Bean(name = "dataSource", initMethod = "init")
 	public SmartRoutingDataSource dataSource() {
 		SmartRoutingDataSource rds = new SmartRoutingDataSource();
+		if(datasource==null || datasource.isEmpty()) {
+			throw new RuntimeException("forgot to config a datasource?");
+		}
 		rds.setDataSourcePropertys(datasource);
 		//设置多个数据源
 		Map<Object, Object> dsMap = new HashMap<>();

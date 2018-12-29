@@ -5,6 +5,7 @@
 
 	<artifactId>alliance-smartdao</artifactId>
 	<packaging>jar</packaging>
+	<version>2.2.0-SNAPSHOT</version>
 
 	<name>smart-dao</name>
 	<description>A simple and smart mybatis and spring boot based dao </description>

@@ -342,13 +342,6 @@ public class CommonDao {
      * @date 2017年12月15日 下午1:24:53
      */
     public <T> int updateByField(Class<T> clazz, String fieldName, Object fieldValue, Object updateObj , boolean updateNull) {
-        try {
-            clazz.getDeclaredField(fieldName);
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeException("类" + clazz + "中不存在字段" + fieldName, e);
-        } catch (SecurityException e) {
-            throw new RuntimeException(e);
-        }
         String tableName = SqlHelper.getTableName(clazz);
         Field[] fields = SqlHelper.getFieldsWithoutTransient(clazz);
         List<Map<String, Object>> columns = new ArrayList<Map<String, Object>>();
@@ -369,7 +362,11 @@ public class CommonDao {
                         continue;	
                 	}
                 }
-                column.put("value", value);
+                if(f.getType().isEnum()) {
+                	column.put("value", ((Enum)value).ordinal());
+                }else {
+                	column.put("value", value);
+                }
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -393,7 +390,7 @@ public class CommonDao {
     public <T> int batchInsert(Class<T> clazz, List<T> list) throws IllegalArgumentException, IllegalAccessException {
     	SmartDatasourceHolder.switchToWrite();
         ParamMap pm = new ParamMap();
-        Field[] fields = clazz.getDeclaredFields();
+        Field[] fields = SqlHelper.getAllDeclaredFields(clazz);
         List<String> columns = new ArrayList<String>();
         for (int i = 0; i < fields.length; i++) {
             if (Modifier.isTransient(fields[i].getModifiers())) {
@@ -423,7 +420,7 @@ public class CommonDao {
 
     private List<Object> getColumnValues(Object obj) {
         List<Object> values = new ArrayList<Object>();
-        Field[] fields = obj.getClass().getDeclaredFields();
+        Field[] fields = SqlHelper.getAllDeclaredFields(obj.getClass());
         for (int i = 0; i < fields.length; i++) {
             if (Modifier.isTransient(fields[i].getModifiers())) {
                 continue;
@@ -472,7 +469,11 @@ public class CommonDao {
                 if (value == null) {
                     continue;
                 }
-                column.put("value", value);
+                if(f.getType().isEnum()) {
+                	column.put("value", ((Enum)value).ordinal());
+                }else {
+                	column.put("value", value);
+                }
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

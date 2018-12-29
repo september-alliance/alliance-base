@@ -115,6 +115,8 @@ public class ReflectHelper {
                     /**------------------end--------------------*/
                 }else if (field.getType().equals(Short.class)) {
                     field.set(dest, Short.valueOf(value.toString()));
+                }else if (field.getType().isEnum()) {
+                    field.set(dest, field.getType().getEnumConstants()[(int)value]);
                 }else {
                     field.set(dest, value);
                 }

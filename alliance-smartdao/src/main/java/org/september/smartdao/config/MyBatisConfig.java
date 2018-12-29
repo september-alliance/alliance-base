@@ -65,18 +65,16 @@ public class MyBatisConfig implements TransactionManagementConfigurer {
         	org.springframework.core.io.Resource[] resources1 = new org.springframework.core.io.Resource[]{};
         	if(myBatisConfigManager!=null) {
         		resources1 = resolver.getResources(myBatisConfigManager.getMapperLocation());
-                  List<org.springframework.core.io.Resource> list = new ArrayList<org.springframework.core.io.Resource>();
-                  for (org.springframework.core.io.Resource res : resources1) {
-                      if (!res.getFilename().contains("CommonEntityMapper.xml")) {
-                          list.add(res);
-                      }
-                  }
-                  resources1 = list.toArray(new org.springframework.core.io.Resource[]{});
         	}else {
-        		resources1 = resolver
-                        .getResources("classpath:/mybatis/mapper/**/*.xml");
+        		resources1 = resolver.getResources("classpath:/mybatis/mapper/**/*.xml");
         	}
-        	
+        	List<org.springframework.core.io.Resource> list = new ArrayList<org.springframework.core.io.Resource>();
+            for (org.springframework.core.io.Resource res : resources1) {
+                if (!res.getFilename().contains("CommonEntityMapper.xml")) {
+                    list.add(res);
+                }
+            }
+            resources1 = list.toArray(new org.springframework.core.io.Resource[]{});
             org.springframework.core.io.Resource[] resources2 = resolver
                     .getResources("classpath:/mybatis/mapper/CommonEntityMapper.xml");
             
