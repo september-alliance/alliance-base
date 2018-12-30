@@ -7,20 +7,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.september.core.component.log.LogHelper;
 import org.september.smartdao.util.ReflectHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 /** 
  * 说明：参数封装Map
  * 
  * 修改时间：2014年9月20日
  * @version
  */
-public class ParamMap extends HashMap{
+public class ParamMap extends HashMap<String ,Object>{
 
 	public static final String Smart_Sql = "smartSql";
 	
-	private static final Logger logger = LoggerFactory.getLogger(ParamMap.class);
+	private static final LogHelper logger = LogHelper.getLogger(ParamMap.class);
+	
 	private static final long serialVersionUID = 1L;
 	
 	/**
@@ -28,15 +28,15 @@ public class ParamMap extends HashMap{
 	 */
 	private List<Order> orders = new ArrayList<Order>();
 	
-	private Map map = null;
+	private Map<String ,Object> map = null;
 	
 	public ParamMap() {
-		map = new HashMap();
+		map = new HashMap<>();
 	}
 	
 	public ParamMap(Object vo){
 		if(vo==null){
-			map = new HashMap();
+			map = new HashMap<>();
 		}
 		map = ReflectHelper.transEmptyString2Null(vo);
 	}
@@ -57,9 +57,8 @@ public class ParamMap extends HashMap{
 		return (String)get(key);
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
-	public Object put(Object key, Object value) {
+	public Object put(String key, Object value) {
 		return map.put(key, value);
 	}
 	

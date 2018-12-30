@@ -7,7 +7,6 @@ import org.september.smartdao.anno.AutoIncrease;
 import org.september.smartdao.anno.Column;
 import org.september.smartdao.anno.Entity;
 import org.september.smartdao.anno.Id;
-import org.september.smartdao.anno.Sequence;
 import org.september.smartdao.anno.Table;
 
 
@@ -20,8 +19,7 @@ public class Book implements Serializable{
      */
     private static transient final long serialVersionUID = 984720158104498086L;
 
-  @Id
-//	@Sequence()
+    @Id
     @AutoIncrease
 	private Long id;
 	

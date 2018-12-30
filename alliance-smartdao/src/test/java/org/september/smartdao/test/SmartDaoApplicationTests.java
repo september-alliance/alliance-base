@@ -21,12 +21,17 @@ import org.september.smartdao.util.SqlHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.Assert;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest
+@SpringBootTest("org.september.smartdao.SmartDaoAutoConfig")
+@Configuration
+@ComponentScan("org.september.smartdao")
 @TestPropertySource("classpath:test.properties")
 public class SmartDaoApplicationTests {
 
@@ -39,13 +44,10 @@ public class SmartDaoApplicationTests {
 	@Autowired
 	private BookService bookService;
 	
-	@Value("${spring.datasource.url}")
-	private String jdbcUrl="";
 	
 	@Test
 	public void contextLoads() {
 		System.out.println("all system go");
-		System.out.println("jdbcUrl="+jdbcUrl);
 		System.out.println("datasource="+ dataSource.getClass());
 		if(dataSource instanceof org.apache.tomcat.jdbc.pool.DataSource){
 			org.apache.tomcat.jdbc.pool.DataSource ds = (org.apache.tomcat.jdbc.pool.DataSource)dataSource;
