@@ -5,15 +5,14 @@
 
 	<artifactId>alliance-smartdao</artifactId>
 	<packaging>jar</packaging>
-	<version>2.2.0-SNAPSHOT</version>
 
 	<name>smart-dao</name>
 	<description>A simple and smart mybatis and spring boot based dao </description>
 
 	<parent>
 		<groupId>org.september</groupId>
-		<artifactId>alliance-parent</artifactId>
-		<version>2.1.1-SNAPSHOT</version>
+		<artifactId>alliance-base</artifactId>
+		<version>2.2.0-SNAPSHOT</version>
 	</parent>
 
 	<properties>
@@ -82,7 +81,7 @@
 		<dependency>
 			<groupId>org.september</groupId>
 			<artifactId>alliance-core</artifactId>
-			<version>2.1.1-SNAPSHOT</version>
+			<version>2.2.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 
