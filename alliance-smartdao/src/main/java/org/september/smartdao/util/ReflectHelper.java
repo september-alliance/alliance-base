@@ -18,8 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.september.core.component.log.LogHelper;
 
 /**
  * 说明：反射工具
@@ -27,7 +26,7 @@ import org.slf4j.LoggerFactory;
  * 修改时间：2014年9月20日
  */
 public class ReflectHelper {
-    private static final Logger logger = LoggerFactory.getLogger(ReflectHelper.class);
+    private static final LogHelper logger = LogHelper.getLogger(ReflectHelper.class);
 
     public static Map<String ,Object> transEmptyString2Null(Object obj) {
         Map<String ,Object> map = new HashMap<>();
@@ -44,7 +43,7 @@ public class ReflectHelper {
                 	map.put(f.getName(), value);
                 }
             } catch (Exception e) {
-                logger.warn("get " + f.getName() + " value of " + obj.getClass().getName() + " failed ");
+                logger.getBuilder().warn("get " + f.getName() + " value of " + obj.getClass().getName() + " failed ");
             }
         }
         return map;
@@ -71,13 +70,13 @@ public class ReflectHelper {
             field.setAccessible(true);
             if (value != null) {
             	//boolean 转 int
-            	if(value instanceof Boolean) {
-            		if((Boolean)value) {
-            			value = 1;
-            		}else {
-            			value = 0;
-            		}
-            	}
+//            	if(value instanceof Boolean) {
+//            		if((Boolean)value) {
+//            			value = 1;
+//            		}else {
+//            			value = 0;
+//            		}
+//            	}
                 if (field.getType().equals(Character.class) || field.getClass().equals(char.class)) {
                     String str = (String) value;
                     if (str.length() > 0) {
