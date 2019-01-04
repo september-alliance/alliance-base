@@ -19,6 +19,8 @@ base项目目前包括以下几个部分
    5. 内置tomcat数据库连接池
    6. sql条件非空智能判断----mapper中不必再写mybatis的<if test>判断。
    7. 分表正在规划中
+   
+   [getting start with smartdao](https://www.jianshu.com/p/96f34e8cdbe9)
 
 ## alliance-simpleweb
    1. 集成了thymeleaf,springsecurity。针对springsecurity做了一些基础配置，拿来即用，避免一些不必要的坑。
