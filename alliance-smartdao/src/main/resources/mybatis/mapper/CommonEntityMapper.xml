@@ -79,7 +79,7 @@
     
     <insert id="insertEntityWithSequence" parameterType="org.september.smartdao.model.ParamMap">
         <selectKey resultType="java.lang.Long" keyProperty="id"      order="BEFORE">
-            select ${selectKey} as id
+            ${selectKey}
         </selectKey>
         insert into ${tableName} (id,
         <foreach collection="columnList" item="queryPair" index="index1" separator=",">
