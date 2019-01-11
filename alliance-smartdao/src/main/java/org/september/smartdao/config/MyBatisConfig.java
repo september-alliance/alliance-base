@@ -53,7 +53,7 @@ public class MyBatisConfig implements TransactionManagementConfigurer {
         }
         PageInterceptor pageInterceptor = new PageInterceptor();
         Properties prop = new Properties();
-        prop.put("helperDialect", "mysql");
+        prop.put("helperDialect", dataSource.getDialect());
         pageInterceptor.setProperties(prop);
         configuration.addInterceptor(pageInterceptor);
         bean.setConfiguration(configuration);

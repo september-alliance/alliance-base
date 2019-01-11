@@ -25,10 +25,13 @@ import org.springframework.util.StringUtils;
 public class SmartDaoDataSourceConfig {
 	
 	private List<DataSourceProperty> datasource;
+	
+	private String dialect;
 
 	@Bean(name = "dataSource", initMethod = "init")
 	public SmartRoutingDataSource dataSource() {
 		SmartRoutingDataSource rds = new SmartRoutingDataSource();
+		rds.setDialect(dialect);
 		if(datasource==null || datasource.isEmpty()) {
 			throw new RuntimeException("forgot to config a datasource?");
 		}
@@ -118,6 +121,10 @@ public class SmartDaoDataSourceConfig {
 		return rds;
 	}
 	
+	public void setDialect(String dialect) {
+		this.dialect = dialect;
+	}
+
 	public void setDatasource(List<DataSourceProperty> datasource) {
 		this.datasource = datasource;
 	}
