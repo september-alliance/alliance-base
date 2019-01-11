@@ -10,6 +10,8 @@ public class SmartRoutingDataSource extends AbstractRoutingDataSource {
 
 	private List<DataSourceProperty> dataSourcePropertys;
 
+	private String dialect;
+	
 	@Override
 	protected Object determineCurrentLookupKey() {
 		return SmartDatasourceHolder.getDataSourceKey();
@@ -26,4 +28,11 @@ public class SmartRoutingDataSource extends AbstractRoutingDataSource {
 		this.dataSourcePropertys = dataSourcePropertys;
 	}
 
+	public String getDialect() {
+		return dialect;
+	}
+
+	public void setDialect(String dialect) {
+		this.dialect = dialect;
+	}
 }
