@@ -44,7 +44,7 @@
         <foreach collection="columns" item="column" index="index1" separator=",">${column}</foreach>
         )values
         <foreach collection="rows" item="row" index="index2" separator=",">
-            ( (select next value for mycatseq_global as id),
+            ( (${selectKey}),
             <foreach collection="row" item="colVal" index="index3" separator=",">#{colVal}</foreach>
             )
         </foreach>

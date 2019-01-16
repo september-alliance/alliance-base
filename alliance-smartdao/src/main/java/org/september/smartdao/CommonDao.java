@@ -418,7 +418,8 @@ public class CommonDao {
 		if (SqlHelper.isAutoInstreaseField(SqlHelper.getIdOfClass(clazz))) {
 			return this.execute("CommonEntityMapper.batchInsertAutoIncrease", pm);
 		} else {
-			// TODO set sequence name
+			Sequence seq = SqlHelper.getIdOfClass(clazz).getAnnotation(Sequence.class);
+			pm.put("selectKey", seq.selectKey());
 			return this.execute("CommonEntityMapper.batchInsertBySequence", pm);
 		}
 
