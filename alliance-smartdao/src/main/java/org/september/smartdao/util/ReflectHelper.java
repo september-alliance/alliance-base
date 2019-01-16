@@ -99,6 +99,9 @@ public class ReflectHelper {
                     Timestamp timestamp = (Timestamp) value;
                     field.set(dest, OffsetDateTime.ofInstant(timestamp.toInstant(), ZoneId.systemDefault()));
                     /**------------------end--------------------*/
+                }else if (value instanceof Timestamp) {
+                	Timestamp tvalue = (Timestamp)value;
+                    field.set(dest, new java.util.Date(tvalue.getTime()));
                 }else if (field.getType().isEnum()) {
                     field.set(dest, field.getType().getEnumConstants()[(int)value]);
                 }else {
