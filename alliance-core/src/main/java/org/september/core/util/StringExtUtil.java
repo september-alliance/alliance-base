@@ -30,7 +30,7 @@ public class StringExtUtil {
                     sb.append(Character.toUpperCase(c));
                     nextUpperCase = false;
                 } else {
-                    sb.append(Character.toLowerCase(c));
+                    sb.append(c);
                 }
             }
         }
