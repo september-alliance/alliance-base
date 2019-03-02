@@ -31,6 +31,9 @@ public class SmartDaoDataSourceConfig {
 	@Bean(name = "dataSource", initMethod = "init")
 	public SmartRoutingDataSource dataSource() {
 		SmartRoutingDataSource rds = new SmartRoutingDataSource();
+		if(dialect==null){
+			throw new RuntimeException("forgot to config a dialect by spring.alliance.dao.dialect ?");
+		}
 		rds.setDialect(dialect);
 		if(datasource==null || datasource.isEmpty()) {
 			throw new RuntimeException("forgot to config a datasource?");
