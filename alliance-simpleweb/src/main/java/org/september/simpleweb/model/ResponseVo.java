@@ -100,6 +100,6 @@ public class ResponseVo<T> implements Serializable{
      * @return
      */
     public static <E> ResponseVo<E> BUILDER() {
-        return new ResponseVo<E>().setErrorType(Error_Type.Business_Exception);
+        return new ResponseVo<E>();
     }
 }

@@ -53,7 +53,7 @@ public class DefaultExceptionHandler {
     @ExceptionHandler(ValidationException.class)
     public ResponseVo<String> handleValidationException(ValidationException e) {
     	logger.getBuilder().warn("参数验证错误",e);
-    	return ResponseVo.<String>BUILDER().setCode(ResponseVo.BUSINESS_CODE.FAILED).setDesc("参数验证异常");
+    	return ResponseVo.<String>BUILDER().setCode(ResponseVo.BUSINESS_CODE.FAILED).setErrorType(Error_Type.Business_Exception).setDesc("参数验证异常");
     }
  
     /**
@@ -63,7 +63,7 @@ public class DefaultExceptionHandler {
     @ExceptionHandler(BusinessException.class)
     public ResponseVo<String> handleServiceException(BusinessException e) {
     	logger.getBuilder().warn("业务系统异常",e);
-    	return ResponseVo.<String>BUILDER().setCode(ResponseVo.BUSINESS_CODE.FAILED).setDesc(e.getMessage());
+    	return ResponseVo.<String>BUILDER().setCode(ResponseVo.BUSINESS_CODE.FAILED).setErrorType(Error_Type.Business_Exception).setDesc(e.getMessage());
     }
  
     /**
