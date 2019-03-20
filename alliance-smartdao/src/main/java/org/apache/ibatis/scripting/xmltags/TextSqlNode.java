@@ -9,6 +9,7 @@ import org.apache.ibatis.scripting.ScriptingException;
 import org.apache.ibatis.type.SimpleTypeRegistry;
 import org.september.smartdao.model.ParamMap;
 import org.september.smartdao.mybatisPlugs.SmartSqlOptimizer;
+import org.springframework.util.StringUtils;
 
 public class TextSqlNode implements SqlNode {
 

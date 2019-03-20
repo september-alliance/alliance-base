@@ -19,6 +19,9 @@ public class SmartSqlOptimizer {
 		StringBuilder out = new StringBuilder();
 		SmartMySqlOutputVisitor visitor = new SmartMySqlOutputVisitor(out , pm2);
 		List<SQLStatement> stmtList = SQLUtils.parseStatements(sql, JdbcConstants.MYSQL);
+		if(stmtList.isEmpty()) {
+			return "";
+		}
 		SQLSelectStatement selectStmt = (SQLSelectStatement) stmtList.get(0);
 		selectStmt.accept(visitor);
 		return removeEndOper(out.toString());

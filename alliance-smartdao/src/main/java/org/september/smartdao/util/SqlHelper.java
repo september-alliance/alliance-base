@@ -136,6 +136,9 @@ public class SqlHelper {
                 return field;
             }
         }
+        if(clazz.getSuperclass()!=Object.class) {
+            return getIdOfClass(clazz.getSuperclass());
+        }
         throw new RuntimeException("Id not found for " + clazz);
     }
 

@@ -13,6 +13,7 @@ public class SmartParamMap extends ParamMap{
 
 	public SmartParamMap(Object obj) {
 		super(obj);
+		put(Smart_Sql , Boolean.TRUE);
 	}
 
 }
