@@ -10,7 +10,7 @@
 	<parent>
 		<groupId>org.september</groupId>
 		<artifactId>alliance-base</artifactId>
-		<version>2.3.1-SNAPSHOT</version>
+		<version>springboot-1.5.12-SNAPSHOT</version>
 	</parent>
 
 	<properties>
@@ -32,6 +32,7 @@
 		<dependency>
 			<groupId>org.springframework.session</groupId>
 			<artifactId>spring-session-core</artifactId>
+			<version>2.0.1.RELEASE</version>
 		</dependency>
 
 		<dependency>
@@ -43,7 +44,7 @@
 		<dependency>
 			<groupId>org.september</groupId>
 			<artifactId>alliance-core</artifactId>
-			<version>2.3.1-SNAPSHOT</version>
+			<version>springboot-1.5.12-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 

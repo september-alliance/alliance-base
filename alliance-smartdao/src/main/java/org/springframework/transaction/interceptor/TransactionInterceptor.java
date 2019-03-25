@@ -11,7 +11,6 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.september.smartdao.datasource.SmartDatasourceHolder;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.BeanFactory;
-import org.springframework.lang.Nullable;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @SuppressWarnings("serial")
@@ -55,7 +54,6 @@ public class TransactionInterceptor  extends TransactionAspectSupport implements
 
 
 	@Override
-	@Nullable
 	public Object invoke(MethodInvocation invocation) throws Throwable {
 		// Work out the target class: may be {@code null}.
 		// The TransactionAttributeSource should be passed the target class
