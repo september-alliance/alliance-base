@@ -27,26 +27,28 @@ public class BaseController {
 	
 	@InitBinder
     protected void initBinder(HttpServletRequest request, ServletRequestDataBinder binder) {
-		if(binder.getTarget()==null) {
-			return;
-		}
-    	for(Field f : binder.getTarget().getClass().getDeclaredFields()) {
-    		DateTimeFormat anno = f.getAnnotation(DateTimeFormat.class);
-    		if(anno!=null) {
-    			if(anno.pattern()==null) {
-    				throw new BusinessException(binder.getTarget().getClass().getName()+"."+f.getName()+"没有设置时间格式");
-    			}
-    			SimpleDateFormat simpleDateFormat = new SimpleDateFormat(anno.pattern());
-    	        simpleDateFormat.setLenient(false);
-    	        CustomDateEditor dateEditor = new CustomDateEditor(simpleDateFormat, true);
-    	        binder.registerCustomEditor(Date.class, f.getName(), dateEditor);
-    		}else {
-    			if(f.getType()==Date.class) {
-    				if(request.getParameter(f.getName())!=null) {
-    					throw new BusinessException(binder.getTarget().getClass().getName()+"."+f.getName()+"没有设置时间格式");
-    				}
-    			}
-    		}
-    	}
+	    binder.registerCustomEditor(Date.class, new CustomDateEditor(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"), true));
+	    binder.registerCustomEditor(Date.class, new CustomDateEditor(new SimpleDateFormat("yyyy-MM-dd"), true));
+//		if(binder.getTarget()==null) {
+//			return;
+//		}
+//    	for(Field f : binder.getTarget().getClass().getDeclaredFields()) {
+//    		DateTimeFormat anno = f.getAnnotation(DateTimeFormat.class);
+//    		if(anno!=null) {
+//    			if(anno.pattern()==null) {
+//    				throw new BusinessException(binder.getTarget().getClass().getName()+"."+f.getName()+"没有设置时间格式");
+//    			}
+//    			SimpleDateFormat simpleDateFormat = new SimpleDateFormat(anno.pattern());
+//    	        simpleDateFormat.setLenient(false);
+//    	        CustomDateEditor dateEditor = new CustomDateEditor(simpleDateFormat, true);
+//    	        binder.registerCustomEditor(Date.class, f.getName(), dateEditor);
+//    		}else {
+//    			if(f.getType()==Date.class) {
+//    				if(request.getParameter(f.getName())!=null) {
+//    					throw new BusinessException(binder.getTarget().getClass().getName()+"."+f.getName()+"没有设置时间格式");
+//    				}
+//    			}
+//    		}
+//    	}
     }
 }
