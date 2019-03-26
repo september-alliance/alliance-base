@@ -10,6 +10,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.september.core.exception.BusinessException;
 import org.september.smartdao.anno.AutoIncrease;
+import org.september.smartdao.anno.OptimisticLock;
 import org.september.smartdao.anno.Sequence;
 import org.september.smartdao.datasource.SmartDatasourceHolder;
 import org.september.smartdao.model.Order;
@@ -355,6 +356,8 @@ public class CommonDao {
 		Field[] fields = SqlHelper.getFieldsWithoutTransient(clazz);
 		List<Map<String, Object>> columns = new ArrayList<Map<String, Object>>();
 		String whereColumnName = fieldName;
+		String lockFieldName = null;
+		Object lockFieldValue = null;
 		for (Field f : fields) {
 			if (f.getName().equals(fieldName)) {
 				whereColumnName = SqlHelper.getColumnName(f);
@@ -376,6 +379,13 @@ public class CommonDao {
 				} else {
 					column.put("value", value);
 				}
+				// 判断是否乐观锁
+	            OptimisticLock lockAnno = f.getAnnotation(OptimisticLock.class);
+	            if(lockAnno!=null) {
+	                lockFieldName = f.getName();
+	                lockFieldValue = value;
+	                continue;
+	            }
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
@@ -386,6 +396,9 @@ public class CommonDao {
 		pm.put("fieldName", whereColumnName);
 		pm.put("fieldValue", fieldValue);
 		pm.put("columnList", columns);
+		pm.put("lockFieldName", lockFieldName);
+		pm.put("lockFieldValue", lockFieldValue);
+		
 		int result = this.execute("CommonEntityMapper.updateByField", pm);
 		return result;
 	}

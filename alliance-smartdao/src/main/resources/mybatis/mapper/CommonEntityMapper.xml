@@ -28,10 +28,16 @@
     <!-- 根据字段更新 -->
     <select id="updateByField" parameterType="org.september.smartdao.model.ParamMap" resultType="Map">
         update ${tableName} set
+        <if test="lockFieldName != null">
+        	${lockFieldName} = ${lockFieldName}+1,
+        </if>
         <foreach collection="columnList" item="column" index="index" separator=",">
             ${column.name}=#{column.value}
         </foreach>
         where ${fieldName}=#{fieldValue}
+        <if test="lockFieldName != null">
+        	and ${lockFieldName}=#{lockFieldValue}
+        </if>
     </select>
 
     <select id="selectId" resultType="Long">
