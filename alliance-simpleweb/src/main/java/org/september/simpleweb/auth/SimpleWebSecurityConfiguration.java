@@ -36,7 +36,7 @@ public class SimpleWebSecurityConfiguration extends WebSecurityConfigurerAdapter
 	private AjaxAuthenticationEntryPoint ajaxAuthenticationEntryPoint;
 	
 	@Autowired
-	WebApplicationContext applicationContext;
+	protected WebApplicationContext applicationContext;
 	
 	@Override
 	public void configure(WebSecurity web) throws Exception {
@@ -69,7 +69,7 @@ public class SimpleWebSecurityConfiguration extends WebSecurityConfigurerAdapter
 				.and().sessionManagement().maximumSessions(3).and().and().logout()
 				.logoutUrl("/logout")
 				// 定义当需要用户登录时候，转到的登录页面
-				.and().formLogin().loginPage("/login").successHandler(new AuthenticationSuccessHandler() {
+				.and().formLogin().loginPage("/login?forward=true").successHandler(new AuthenticationSuccessHandler() {
 
 					@Override
 					public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
