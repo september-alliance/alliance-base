@@ -69,7 +69,7 @@ public class CommonDao {
 	 * @Description:根据id(由注解 @Id 决定 ) 更新entity中不为null的值
 	 * @date 2017/12/22
 	 */
-	public void update(Object entity) {
+	public int update(Object entity) {
 		try {
 			SmartDatasourceHolder.switchToWrite();
 			// 得到类中属性id
@@ -80,13 +80,14 @@ public class CommonDao {
 				if (val == null) {
 					throw new BusinessException("id can't be null when update");
 				}
-				this.updateByField(entity.getClass(), id.getName(), val, entity, false);
+				return this.updateByField(entity.getClass(), id.getName(), val, entity, false);
 			}
 		} catch (IllegalAccessException e) {
 			throw new RuntimeException(e);
 		} catch (Exception e) {
 			throw new BusinessException("更新数据失败", e);
 		}
+		return 0;
 	}
 
 	public void updateWithNullFields(Object entity) {
