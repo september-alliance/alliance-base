@@ -6,6 +6,14 @@
     <select id="getById" parameterType="Object" resultType="Map">
 		select * from ${tableName} where ${idColumn}=#{idValue}
 	</select>
+	
+	<!-- 根据id list批量查询数据 -->
+	<delete id="listByIds" parameterType="org.september.smartdao.model.ParamMap">
+        select * from ${tableName} where ${idColumn} in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
 
     <!-- 单表等于查询 -->
     <select id="listByExample" parameterType="org.september.smartdao.model.ParamMap" resultType="Map">

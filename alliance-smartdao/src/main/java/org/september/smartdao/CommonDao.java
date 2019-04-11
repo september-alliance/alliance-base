@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.september.core.exception.BusinessException;
 import org.september.smartdao.anno.AutoIncrease;
@@ -167,11 +168,27 @@ public class CommonDao {
 		T result = ReflectHelper.transformMapToEntity(clazz, map);
 		return result;
 	}
+	
+	public <T> List<T> listByIds(Class<T> clazz , List<? extends Object> ids){
+	    if(CollectionUtils.isEmpty(ids)) {
+	        return new ArrayList<>();
+	    }
+	    SmartDatasourceHolder.switchToRead();
+        String tableName = SqlHelper.getTableName(clazz);
+        ParamMap pm = new ParamMap();
+        pm.put("tableName", tableName);
+        pm.put("idColumn", SqlHelper.getIdColumnOfClass(clazz));
+        pm.put("ids", ids);
+        List<Map<String, Object>> mapResult = sqlSessionTemplate.selectList("CommonEntityMapper.listByIds", pm);
+        List<?> entityResult = ReflectHelper.transformMapToEntity(clazz, mapResult);
+        return (List<T>) entityResult;
+	}
 
 	/**
 	 * 与listByExample方式一样，单返回单条数据
 	 */
 	public <T> T getByExample(T example) {
+	    // TODO 需要做limit限制
 		if (example == null) {
 			return null;
 		}
