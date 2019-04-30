@@ -57,6 +57,12 @@ public class CommonDao {
 				long id = (long) pm.get("id");
 				BeanUtils.setProperty(entity, keyName, id);
 			} else {
+			    Field idField = SqlHelper.getIdOfEntity(entity);
+			    idField.setAccessible(true);
+			    QueryPair id = new QueryPair();
+			    id.setColumnName(keyName);
+			    id.setColumnValue(idField.get(entity));
+			    queryPairList.add(id);
 				sqlSessionTemplate.insert("CommonEntityMapper.insertEntityWithId", pm);
 			}
 
