@@ -12,6 +12,7 @@ import org.september.core.exception.NotAuthorizedException;
 import org.september.simpleweb.model.ArgError;
 import org.september.simpleweb.model.ResponseVo;
 import org.september.simpleweb.model.ResponseVo.Error_Type;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -63,7 +64,11 @@ public class DefaultExceptionHandler {
     @ExceptionHandler(BusinessException.class)
     public ResponseVo<String> handleServiceException(BusinessException e) {
     	logger.getBuilder().warn("业务系统异常",e);
-    	return ResponseVo.<String>BUILDER().setCode(ResponseVo.BUSINESS_CODE.FAILED).setErrorType(Error_Type.Business_Exception).setDesc(e.getMessage());
+    	int code = ResponseVo.BUSINESS_CODE.FAILED;
+    	if(!StringUtils.isEmpty(code)) {
+    	    code = Integer.parseInt(e.getCode());
+    	}
+    	return ResponseVo.<String>BUILDER().setCode(code).setErrorType(Error_Type.Business_Exception).setDesc(e.getMessage());
     }
  
     /**

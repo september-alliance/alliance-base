@@ -24,7 +24,12 @@ public class BusinessException extends RuntimeException{
 	
 	public BusinessException(String msg , String code){
 		super(msg);
-		this.code = code;
+		try {
+    		Integer.parseInt(code);
+    		this.code = code;
+		}catch(Exception ex) {
+		    throw new RuntimeException("you are not support to set code not a number though it's String type");
+		}
 	}
 	
 	public BusinessException(String msg , String code , Throwable ex){
