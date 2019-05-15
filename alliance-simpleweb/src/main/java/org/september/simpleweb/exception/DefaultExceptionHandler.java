@@ -65,7 +65,7 @@ public class DefaultExceptionHandler {
     public ResponseVo<String> handleServiceException(BusinessException e) {
     	logger.getBuilder().warn("业务系统异常",e);
     	int code = ResponseVo.BUSINESS_CODE.FAILED;
-    	if(!StringUtils.isEmpty(code)) {
+    	if(!StringUtils.isEmpty(e.getCode())) {
     	    code = Integer.parseInt(e.getCode());
     	}
     	return ResponseVo.<String>BUILDER().setCode(code).setErrorType(Error_Type.Business_Exception).setDesc(e.getMessage());
