@@ -37,7 +37,8 @@ public class DefaultExceptionHandler {
     public ResponseVo<String> handleBindException(BindException e) {
     	logger.getBuilder().warn("参数格式错误",e);
     	ResponseVo<String> resp = ResponseVo.<String>BUILDER().setCode(ResponseVo.BUSINESS_CODE.FAILED).setErrorType(ResponseVo.Error_Type.Args_Not_Valid);
-        BindingResult result = e.getBindingResult();
+        resp.setDesc("参数格式错误");
+    	BindingResult result = e.getBindingResult();
         for(FieldError error : result.getFieldErrors()) {
         	ArgError err = new ArgError();
         	err.setField(error.getField());
