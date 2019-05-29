@@ -41,7 +41,7 @@ public class TextSqlNode implements SqlNode {
 		if(_parameter instanceof Map){
 			Map map = (Map)_parameter;
 			if(map!=null && Boolean.TRUE.equals(map.get(ParamMap.Smart_Sql))){
-				String sql = SmartSqlOptimizer.optimize(text, map);
+				String sql = SmartSqlOptimizer.optimize(text, (ParamMap)map);
 				context.appendSql(parser.parse(sql));
 			}else{
 				context.appendSql(parser.parse(text));

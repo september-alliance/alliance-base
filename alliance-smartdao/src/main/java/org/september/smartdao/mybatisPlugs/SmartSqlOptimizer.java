@@ -14,7 +14,7 @@ import com.alibaba.druid.util.JdbcConstants;
 
 public class SmartSqlOptimizer {
 
-	public static String optimize(String sql , Map map){
+	public static String optimize(String sql , ParamMap map){
 		ParamMap pm2 = fullfillParamMap(map);
 		StringBuilder out = new StringBuilder();
 		SmartMySqlOutputVisitor visitor = new SmartMySqlOutputVisitor(out , pm2);
@@ -41,12 +41,13 @@ public class SmartSqlOptimizer {
 		return sql;
 	}
 	
-	private static ParamMap fullfillParamMap(Map pm) {
+	private static ParamMap fullfillParamMap(ParamMap pm) {
 		ParamMap pm2 = new ParamMap();
 		for(Object key : pm.keySet()){
 			pm2.put("#{"+key+"}", pm.get(key));
 			pm2.put("${"+key+"}", pm.get(key));
 		}
+		pm2.getOrders().addAll(pm.getOrders());
 		return pm2;
 	}
 

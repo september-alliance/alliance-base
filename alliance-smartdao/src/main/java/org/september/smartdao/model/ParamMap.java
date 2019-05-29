@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.september.core.component.log.LogHelper;
+import org.september.smartdao.model.Order.Direction;
 import org.september.smartdao.util.ReflectHelper;
 /** 
  * 说明：参数封装Map
@@ -104,6 +105,10 @@ public class ParamMap extends HashMap<String ,Object>{
 		return map.values();
 	}
 	
+	@Deprecated
+	public void addOrder(String field , String direction){
+	}
+	
 	/**
 	 * 增加一个排序条件,注意<param>field</param>是要排序的数据库字段名称，而不是实体类中类字段名,业务代码需要将实体类的类字段名转成数据库字段名,
 	 * 可以使用
@@ -112,8 +117,8 @@ public class ParamMap extends HashMap<String ,Object>{
 	 * @param field 
 	 * @param direction
 	 */
-	public void addOrder(String field , String direction){
-		
+	public void addOrder(String field , Direction direction){
+		orders.add(new Order(field , direction));
 	}
 	
 	public List<Order> getOrders(){

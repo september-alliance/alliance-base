@@ -3,12 +3,16 @@ package org.september.smartdao.mybatisPlugs;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.september.smartdao.model.Order;
+import org.september.smartdao.model.Order.Direction;
 import org.september.smartdao.model.ParamMap;
 import org.springframework.util.StringUtils;
 
 import com.alibaba.druid.sql.ast.SQLCommentHint;
 import com.alibaba.druid.sql.ast.SQLExpr;
 import com.alibaba.druid.sql.ast.SQLObject;
+import com.alibaba.druid.sql.ast.SQLOrderBy;
+import com.alibaba.druid.sql.ast.SQLOrderingSpecification;
 import com.alibaba.druid.sql.ast.SQLSetQuantifier;
 import com.alibaba.druid.sql.ast.expr.SQLBinaryOpExpr;
 import com.alibaba.druid.sql.ast.expr.SQLBinaryOperator;
@@ -256,6 +260,21 @@ public class SmartMySqlOutputVisitor extends MySqlOutputVisitor {
         	trimEndOper();
             println();
             x.getOrderBy().accept(this);
+        }else {
+            if(!pm.getOrders().isEmpty()) {
+            	x.setOrderBy(new SQLOrderBy());
+            	for(Order order : pm.getOrders()) {
+            		if(Direction.ASC == order.getDirection()) {
+            			x.getOrderBy().addItem(new SQLIdentifierExpr(order.getProperty()), SQLOrderingSpecification.ASC);
+            		}else {
+            			x.getOrderBy().addItem(new SQLIdentifierExpr(order.getProperty()), SQLOrderingSpecification.DESC);
+            		}
+            	}
+            	trimEndOper();
+                println();
+                x.getOrderBy().accept(this);
+            }
+            
         }
 
         if (x.getLimit() != null) {
