@@ -151,6 +151,12 @@
                 ${queryPair.columnName}=#{queryPair.columnValue}
             </foreach>
         </where>
+        <if test="orders != null and orders.size()>0">
+            ORDER BY
+            <foreach collection="orders" item="item" index="index1" separator=",">
+                ${item.property} ${item.direction}
+            </foreach>
+        </if>
     </select>
     
     <!-- 根据字段统计梳理 -->

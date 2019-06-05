@@ -291,6 +291,12 @@ public class CommonDao {
 	 * @date 2017/12/22
 	 */
 	public <T> Page<T> findPageByExample(Class<T> clazz, Page<T> page, Object example) {
+		return findPageByExample(clazz , page , example , null);
+	}
+	
+	/**
+	 */
+	public <T> Page<T> findPageByExample(Class<T> clazz, Page<T> page, Object example, List<Order> orders) {
 		SmartDatasourceHolder.switchToRead();
 		String tableName = SqlHelper.getTableName(clazz);
 		List<QueryPair> queryPairs = SqlHelper.getQueryPairs(example);
@@ -298,6 +304,11 @@ public class CommonDao {
 		paramMap.put("tableName", tableName);
 		paramMap.put("queryPairList", queryPairs);
 		paramMap.put("page", page);
+		paramMap.put("queryPairList", queryPairs);
+		if (orders != null && !orders.isEmpty()) {
+			paramMap.put("orders", orders);
+		}
+		
 		com.github.pagehelper.Page<T> innerPage = PageHelper.startPage(page.getCurrentPage(), page.getPageSize());
 		List<Map<String, Object>> mapResult = sqlSessionTemplate.selectList("CommonEntityMapper.findPage", paramMap);
 		List<T> entityResult = ReflectHelper.transformMapToEntity(clazz, mapResult);
@@ -307,6 +318,7 @@ public class CommonDao {
 		page.setStartRow(pageInfo.getStartRow());
 		page.setEndRow(pageInfo.getEndRow());
 		return page;
+
 	}
 
 	/**
