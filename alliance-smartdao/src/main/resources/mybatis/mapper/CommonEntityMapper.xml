@@ -37,7 +37,7 @@
     <select id="updateByField" parameterType="org.september.smartdao.model.ParamMap" resultType="Map">
         update ${tableName} set
         <if test="lockFieldName != null">
-        	${lockFieldName} = ${lockFieldName}+1,
+        	${lockFieldName} = #{lockFieldValue}+1,
         </if>
         <foreach collection="columnList" item="column" index="index" separator=",">
             ${column.name}=#{column.value}
