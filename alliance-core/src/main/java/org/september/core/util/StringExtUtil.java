@@ -230,4 +230,19 @@ public class StringExtUtil {
 	}
 
 
+
+	public static boolean safeEquals(String secret, String secretCode) {
+		if(secret==null || secretCode==null) {
+			return false;
+		}
+		return secret.equals(secretCode);
+	}
+
+	public static boolean safeEqualsIgnoreCase(String secret, String secretCode) {
+		if(secret==null || secretCode==null) {
+			return false;
+		}
+		return secret.equalsIgnoreCase(secretCode);
+	}
+
 }
