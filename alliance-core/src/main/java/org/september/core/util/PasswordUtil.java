@@ -24,11 +24,15 @@ public class PasswordUtil {
     };
 
     public static String randomPassword() {
+    	Random random = new Random(new Date().getTime());
+    	int length = random.nextInt(3) + 8;
+    	return randomPassword(length);
+    }
+    
+    public static String randomPassword(int length) {
         StringBuffer stringBuffer = new StringBuffer();
         Random random = new Random(new Date().getTime());
         boolean flag = false;
-        //输出几位密码长度  这里是有可能8 ，9 ，10 位
-        int length = random.nextInt(3) + 8;
         for (int i = 0; i < length; i++) {
             if (flag) {
                 stringBuffer.append(num[random.nextInt(num.length)]);

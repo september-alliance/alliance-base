@@ -445,7 +445,7 @@ public class CommonDao {
 	 * @author yexinzhou
 	 * @date 2017年12月18日 上午9:12:59
 	 */
-	public <T> int batchInsert(Class<T> clazz, List<T> list) throws IllegalArgumentException, IllegalAccessException {
+	public <T> int batchInsert(Class<T> clazz, List<T> list) {
 		SmartDatasourceHolder.switchToWrite();
 		ParamMap pm = new ParamMap();
 		Field[] fields = SqlHelper.getFieldsWithoutTransient(clazz);
