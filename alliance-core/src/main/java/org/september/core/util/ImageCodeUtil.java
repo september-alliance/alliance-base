@@ -16,9 +16,9 @@ public final class ImageCodeUtil {
       
     // 验证码字符集  
     private static final char[] chars = {   
-        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',   
+        '2', '3', '4', '5', '6', '7', '8', '9',   
         'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',   
-        'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};  
+        'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};  
     // 字符数量  
     private static final int SIZE = 4;  
     // 干扰线数量  
@@ -28,7 +28,7 @@ public final class ImageCodeUtil {
     // 高度  
     private static final int HEIGHT = 40;  
     // 字体大小  
-    private static final int FONT_SIZE = 30;  
+    private static final int FONT_SIZE = 25;  
   
     /** 
      * 生成随机验证码及图片 
@@ -52,7 +52,7 @@ public final class ImageCodeUtil {
             // 取随机字符索引  
             int n = ran.nextInt(chars.length);  
             // 设置随机颜色  
-            graphic.setColor(getRandomColor());  
+            graphic.setColor(Color.RED);  
             // 设置字体大小  
             graphic.setFont(new Font(  
                 null, Font.BOLD + Font.ITALIC, FONT_SIZE));  
