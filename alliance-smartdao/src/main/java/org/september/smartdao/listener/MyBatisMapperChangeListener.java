@@ -41,7 +41,7 @@ import org.springframework.stereotype.Component;
  * 修改mapper文件不重启
  * longqiong,yexinzhou
  */
-@Component
+//@Component
 public class MyBatisMapperChangeListener implements InitializingBean, ApplicationContextAware {
     private volatile ConfigurableApplicationContext context = null;
     private volatile Scanner scanner = null;

@@ -11,6 +11,7 @@ import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
+import org.september.core.component.ApplicationContextHolder;
 import org.september.smartdao.datasource.SmartRoutingDataSource;
 import org.september.smartdao.model.ParamMap;
 import org.september.smartdao.mybatisPlugs.MapWrapperFactory;
@@ -32,6 +33,9 @@ public class MyBatisConfig implements TransactionManagementConfigurer {
     private MyBatisConfigManager myBatisConfigManager;
     @Resource
     SmartRoutingDataSource dataSource;
+    
+    @Autowired
+    private ApplicationContextHolder applicationContextHolder;
 
     @Bean(name = "sqlSessionFactory")
     public SqlSessionFactory sqlSessionFactoryBean() {
@@ -75,10 +79,17 @@ public class MyBatisConfig implements TransactionManagementConfigurer {
                 }
             }
             resources1 = list.toArray(new org.springframework.core.io.Resource[]{});
-            org.springframework.core.io.Resource[] resources2 = resolver
-                    .getResources("classpath:/mybatis/mapper/CommonEntityMapper.xml");
+            List<org.springframework.core.io.Resource> resourcesList = new ArrayList<>();
+            resourcesList.add(resolver.getResource("classpath:/mybatis/mapper/CommonEntityMapper.xml"));
             
-            int length = resources1.length + resources2.length;
+            if(applicationContextHolder.getContext().getBeansOfType(MyBatisResourceCustomerResolver.class)!=null) {
+            	for(MyBatisResourceCustomerResolver resolverx : applicationContextHolder.getContext().getBeansOfType(MyBatisResourceCustomerResolver.class).values()) {
+            		resourcesList.addAll(resolverx.getResourcesList(resolver));
+            	}
+            }
+            
+            org.springframework.core.io.Resource[] resources2 = resourcesList.toArray(new org.springframework.core.io.Resource[] {});
+            int length = resources1.length + resourcesList.size();
             org.springframework.core.io.Resource[] resources = Arrays.copyOf(resources1, length);
             System.arraycopy(resources2, 0, resources, resources1.length, resources2.length);
             bean.setMapperLocations(resources);
