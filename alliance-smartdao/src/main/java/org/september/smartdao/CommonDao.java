@@ -29,6 +29,10 @@ import com.github.pagehelper.PageInfo;
 @Component
 public class CommonDao {
 
+	public CommonDao() {
+		CommonDaoHolder.dao = this;
+	}
+	
 	@Autowired
 	SqlSessionTemplate sqlSessionTemplate;
 
