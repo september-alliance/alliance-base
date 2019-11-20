@@ -2,6 +2,7 @@ package org.september.simpleweb.controller;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.september.simpleweb.auth.DefaultMethod;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class CommonErrorController implements ErrorController {
 
+	@DefaultMethod
 	@RequestMapping("/error")
     public String handleError(HttpServletRequest request){
         //获取statusCode:401,404,500

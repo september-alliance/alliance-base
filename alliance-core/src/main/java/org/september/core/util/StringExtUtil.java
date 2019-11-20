@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.springframework.util.StringUtils;
 
 public class StringExtUtil {
 
@@ -245,4 +246,16 @@ public class StringExtUtil {
 		return secret.equalsIgnoreCase(secretCode);
 	}
 
+	public static List<Long> sperateToLongList(String data , String seprator){
+		if(data==null) {
+			return null;
+		}
+		List<Long> list = new ArrayList<>();
+		for(String str: data.split(seprator)) {
+			if(!StringUtils.isEmpty(str)) {
+				list.add(Long.valueOf(str));
+			}
+		}
+		return list;
+	}
 }
