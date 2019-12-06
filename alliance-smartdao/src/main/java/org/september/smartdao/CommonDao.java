@@ -543,4 +543,10 @@ public class CommonDao {
 		Long result = sqlSessionTemplate.selectOne("CommonEntityMapper.countByExample", pm);
 		return result.intValue();
 	}
+
+	public int count(String statment, ParamMap pm) {
+		Map<String, Object> map = findOne(statment , pm);
+		long total = (long)map.get("total");
+		return (int)total;
+	}
 }
