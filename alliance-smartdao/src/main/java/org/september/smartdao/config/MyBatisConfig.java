@@ -70,7 +70,7 @@ public class MyBatisConfig implements TransactionManagementConfigurer {
         	if(myBatisConfigManager!=null) {
         		resources1 = resolver.getResources(myBatisConfigManager.getMapperLocation());
         	}else {
-        		resources1 = resolver.getResources("classpath:/mybatis/mapper/**/*.xml");
+        		resources1 = resolver.getResources("classpath*:/mybatis/mapper/**/*.xml");
         	}
         	List<org.springframework.core.io.Resource> list = new ArrayList<org.springframework.core.io.Resource>();
             for (org.springframework.core.io.Resource res : resources1) {
