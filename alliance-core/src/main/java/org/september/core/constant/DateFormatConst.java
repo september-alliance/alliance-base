@@ -12,4 +12,7 @@ public interface DateFormatConst {
 	public final static SimpleDateFormat yyyyMMddHHmmss = new SimpleDateFormat("yyyyMMddHHmmss");
 	
 	public final static SimpleDateFormat yyyy_MM_dd_Zn_Ch = new SimpleDateFormat("yyyy年MM月dd日");
+	
+	public final static SimpleDateFormat yyyy_MM_dd_HH_mm_ss_SSS = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss-SSS");
+	
 }
