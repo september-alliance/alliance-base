@@ -11,6 +11,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.september.core.exception.BusinessException;
 import org.september.smartdao.anno.AutoIncrease;
+import org.september.smartdao.anno.IntegerDefaultValue;
 import org.september.smartdao.anno.OptimisticLock;
 import org.september.smartdao.anno.Sequence;
 import org.september.smartdao.datasource.SmartDatasourceHolder;
@@ -44,7 +45,7 @@ public class CommonDao {
 	public void save(Object entity) {
 		try {
 			SmartDatasourceHolder.switchToWrite();
-			List<QueryPair> queryPairList = SqlHelper.getQueryPairs(entity);
+			List<QueryPair> queryPairList = SqlHelper.getQueryPairs(entity,true);
 			ParamMap pm = new ParamMap();
 			pm.put("columnList", queryPairList);
 			pm.put("tableName", SqlHelper.getTableName(entity.getClass()));
@@ -462,7 +463,7 @@ public class CommonDao {
 		}
 		List<List<Object>> rows = new ArrayList<List<Object>>();
 		for (T obj : list) {
-			List<Object> values = getColumnValues(obj);
+			List<Object> values = getBatchInsertColumnValues(obj);
 			rows.add(values);
 		}
 		pm.put("tableName", SqlHelper.getTableName(clazz));
@@ -478,7 +479,7 @@ public class CommonDao {
 
 	}
 
-	private List<Object> getColumnValues(Object obj) {
+	private List<Object> getBatchInsertColumnValues(Object obj) {
 		List<Object> values = new ArrayList<Object>();
 		Field[] fields = SqlHelper.getFieldsWithoutTransient(obj.getClass());
 
@@ -504,6 +505,13 @@ public class CommonDao {
 			try {
 				fields[i].setAccessible(true);
 				Object val = fields[i].get(obj);
+				if(val==null) {
+					//get default value
+                	IntegerDefaultValue anno = fields[i].getAnnotation(IntegerDefaultValue.class);
+                	if(anno!=null) {
+                		val = anno.value();
+                	}
+				}
 				values.add(val);
 			} catch (Exception e) {
 				throw new BusinessException("批量插入数据失败", e);

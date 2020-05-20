@@ -10,6 +10,7 @@ import org.september.core.component.log.LogHelper;
 import org.september.smartdao.anno.AutoIncrease;
 import org.september.smartdao.anno.Column;
 import org.september.smartdao.anno.Id;
+import org.september.smartdao.anno.IntegerDefaultValue;
 import org.september.smartdao.anno.Table;
 import org.september.smartdao.model.QueryPair;
 
@@ -28,6 +29,9 @@ public class SqlHelper {
     }
 
     public static List<QueryPair> getQueryPairs(Object parameterObject) {
+    	return getQueryPairs(parameterObject , false);
+    }
+    public static List<QueryPair> getQueryPairs(Object parameterObject,boolean defaultValue) {
     	List<QueryPair> result = new ArrayList<QueryPair>();
     	if(parameterObject==null){
     		return result;
@@ -58,6 +62,17 @@ public class SqlHelper {
                         pair.setColumnValue(val);
                         result.add(pair);
                     }
+                }else {
+                	if(defaultValue) {
+                		//get default value
+                    	QueryPair pair = new QueryPair();
+                    	pair.setColumnName(getColumnName(fields[i]));
+                    	IntegerDefaultValue anno = fields[i].getAnnotation(IntegerDefaultValue.class);
+                    	if(anno!=null) {
+                    		pair.setColumnValue(anno.value());
+                    		result.add(pair);
+                    	}
+                	}
                 }
             } catch (Exception e) {
                 throw new RuntimeException(e);
