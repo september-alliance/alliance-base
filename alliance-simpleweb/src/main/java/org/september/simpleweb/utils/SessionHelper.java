@@ -1,5 +1,7 @@
 package org.september.simpleweb.utils;
 
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -25,4 +27,15 @@ public class SessionHelper {
 		HttpServletRequest request = ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest();
 		return request.getSession();
 	}
+	
+	public static void setLoginReturnData(Map data) {
+		HttpServletRequest request = ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest();
+		request.getSession().setAttribute(WebConst.Session.Login_Return_Data_Key, data);
+	}
+	
+	public static Map getLoginReturnData() {
+		HttpServletRequest request = ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest();
+		return (Map)request.getSession().getAttribute(WebConst.Session.Login_Return_Data_Key);
+	}
+	
 }

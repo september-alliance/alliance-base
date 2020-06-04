@@ -6,5 +6,6 @@ package org.september.simpleweb.model;
 public interface WebConst {
     interface Session {
         final String Session_User_Key = "sessionUser";
+        final String Login_Return_Data_Key = "loginReturnData";
     }
 }

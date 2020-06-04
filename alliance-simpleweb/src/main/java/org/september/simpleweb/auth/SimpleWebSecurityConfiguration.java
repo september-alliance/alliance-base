@@ -74,7 +74,7 @@ public class SimpleWebSecurityConfiguration extends WebSecurityConfigurerAdapter
 					@Override
 					public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
 							Authentication authentication) throws IOException, ServletException {
-						ResponseVo<String> res = ResponseVo.<String>BUILDER().setData("").setCode(ResponseVo.BUSINESS_CODE.SUCCESS);
+						ResponseVo<Object> res = ResponseVo.<Object>BUILDER().setData(SessionHelper.getLoginReturnData()).setCode(ResponseVo.BUSINESS_CODE.SUCCESS);
 						response.setContentType("application/json;charset=utf-8");
 						SessionHelper.setSessionUser(authentication.getPrincipal());
 						PrintWriter out = response.getWriter();
