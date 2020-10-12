@@ -451,6 +451,9 @@ public class CommonDao {
 	 * @date 2017年12月18日 上午9:12:59
 	 */
 	public <T> int batchInsert(Class<T> clazz, List<T> list) {
+		if(list==null || list.isEmpty()) {
+			return 0;
+		}
 		SmartDatasourceHolder.switchToWrite();
 		ParamMap pm = new ParamMap();
 		Field[] fields = SqlHelper.getFieldsWithoutTransient(clazz);
