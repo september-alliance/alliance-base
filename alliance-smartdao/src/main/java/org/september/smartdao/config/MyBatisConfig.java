@@ -7,12 +7,14 @@ import java.util.Properties;
 
 import javax.annotation.Resource;
 
+import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.september.core.component.ApplicationContextHolder;
 import org.september.smartdao.datasource.SmartRoutingDataSource;
+import org.september.smartdao.log.SmartSlf4jImpl;
 import org.september.smartdao.model.ParamMap;
 import org.september.smartdao.mybatisPlugs.MapWrapperFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +53,8 @@ public class MyBatisConfig implements TransactionManagementConfigurer {
         configuration.setLogPrefix("dao.");
         configuration.setDefaultExecutorType(ExecutorType.REUSE);
         configuration.getTypeAliasRegistry().registerAlias("ParamMap", ParamMap.class);
+        
+        configuration.setLogImpl(SmartSlf4jImpl.class);
         
         if (myBatisConfigManager != null) {
         	myBatisConfigManager.config(configuration);

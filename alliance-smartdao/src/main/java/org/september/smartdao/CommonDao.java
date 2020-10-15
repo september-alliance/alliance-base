@@ -15,6 +15,7 @@ import org.september.smartdao.anno.IntegerDefaultValue;
 import org.september.smartdao.anno.OptimisticLock;
 import org.september.smartdao.anno.Sequence;
 import org.september.smartdao.datasource.SmartDatasourceHolder;
+import org.september.smartdao.log.SmartSlf4jLocationAwareLoggerImpl;
 import org.september.smartdao.model.Order;
 import org.september.smartdao.model.Page;
 import org.september.smartdao.model.ParamMap;
@@ -209,6 +210,13 @@ public class CommonDao {
 		} else {
 			return list.get(0);
 		}
+	}
+	
+	public <T> T getByExampleWithNoLog(T example) {
+		SmartSlf4jLocationAwareLoggerImpl.enableDebugger.set(false);
+	    T result = getByExample(example);
+	    SmartSlf4jLocationAwareLoggerImpl.enableDebugger.set(true);
+	    return result;
 	}
 
 	public <T> List<T> listByExample(T example) {
