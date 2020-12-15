@@ -7,6 +7,7 @@ import java.util.Map;
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.september.smartdao.datasource.SmartDatasourceHolder;
 import org.september.smartdao.datasource.SmartRoutingDataSource;
+import org.september.smartdao.util.DataSourceUtil;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,15 +31,15 @@ public class SmartDaoDataSourceConfig {
 
 	@Bean(name = "dataSource", initMethod = "init")
 	public SmartRoutingDataSource dataSource() {
-		SmartRoutingDataSource rds = new SmartRoutingDataSource();
+		SmartRoutingDataSource srds = new SmartRoutingDataSource();
 		if(dialect==null){
 			throw new RuntimeException("forgot to config a dialect by spring.alliance.dao.dialect ?");
 		}
-		rds.setDialect(dialect);
+		srds.setDialect(dialect);
 		if(datasource==null || datasource.isEmpty()) {
 			throw new RuntimeException("forgot to config a datasource?");
 		}
-		rds.setDataSourcePropertys(datasource);
+		srds.setDataSourcePropertys(datasource);
 		//设置多个数据源
 		Map<Object, Object> dsMap = new HashMap<>();
 		Map<String , DataSourceGroup> dsGroupsMap = new HashMap<>();
@@ -53,50 +54,8 @@ public class SmartDaoDataSourceConfig {
 			}
 			DataSourceGroup group = dsGroupsMap.get(dsp.getGroup());
 			DataSource ds = new DataSource();
-			ds.setUrl(dsp.getJdbcUrl());
-			ds.setDriverClassName(dsp.getDriverClass());
-			ds.setUsername(dsp.getUsername());
-			ds.setPassword(dsp.getPassword());
 			
-			ds.setAbandonWhenPercentageFull(dsp.getAbandonWhenPercentageFull());
-			ds.setAccessToUnderlyingConnectionAllowed(dsp.isAccessToUnderlyingConnectionAllowed());
-			ds.setAlternateUsernameAllowed(dsp.isAlternateUsernameAllowed());
-			ds.setCommitOnReturn(dsp.isCommitOnReturn());
-			ds.setDataSourceJNDI(dsp.getDataSourceJNDI());
-			ds.setDefaultAutoCommit(dsp.getDefaultAutoCommit());
-			ds.setDefaultReadOnly(dsp.getDefaultReadOnly());
-			ds.setDefaultTransactionIsolation(dsp.getDefaultTransactionIsolation());
-			ds.setFairQueue(dsp.isFairQueue());
-			ds.setIgnoreExceptionOnPreLoad(dsp.isIgnoreExceptionOnPreLoad());
-			ds.setInitialSize(dsp.getInitialSize());
-			ds.setInitSQL(dsp.getInitSQL());
-			ds.setJdbcInterceptors(dsp.getJdbcInterceptors());
-			ds.setJmxEnabled(dsp.isJmxEnabled());
-			ds.setLogAbandoned(dsp.isLogAbandoned());
-			ds.setLogValidationErrors(dsp.isLogValidationErrors());
-			ds.setMaxActive(dsp.getMaxActive());
-			ds.setMaxAge(dsp.getMaxAge());
-			ds.setMaxIdle(dsp.getMaxIdle());
-			ds.setMaxWait(dsp.getMaxWait());
-			ds.setMinIdle(dsp.getMinIdle());
-			ds.setMinEvictableIdleTimeMillis(dsp.getMinEvictableIdleTimeMillis());
-			ds.setPropagateInterruptState(dsp.isPropagateInterruptState());
-			ds.setRemoveAbandoned(dsp.isRemoveAbandoned());
-			ds.setRemoveAbandonedTimeout(dsp.getRemoveAbandonedTimeout());
-			ds.setRollbackOnReturn(dsp.isRollbackOnReturn());
-			ds.setSuspectTimeout(dsp.getSuspectTimeout());
-			ds.setTestOnBorrow(dsp.isTestOnBorrow());
-			ds.setTestOnConnect(dsp.isTestOnConnect());
-			ds.setTestOnReturn(dsp.isTestOnReturn());
-			ds.setTestWhileIdle(dsp.isTestWhileIdle());
-			ds.setTimeBetweenEvictionRunsMillis(dsp.getTimeBetweenEvictionRunsMillis());
-			ds.setUseDisposableConnectionFacade(dsp.isUseDisposableConnectionFacade());
-			ds.setUseEquals(dsp.isUseEquals());
-			ds.setUseLock(dsp.isUseLock());
-			ds.setUseStatementFacade(dsp.isUseStatementFacade());
-			ds.setValidationQuery(dsp.getValidationQuery());
-			ds.setValidationInterval(dsp.getValidationInterval());
-			ds.setValidationQueryTimeout(dsp.getValidationQueryTimeout());
+			DataSourceUtil.copyProps(dsp, ds);
 			
 			if(dsp.getType()!=null) {
 				if(dsp.getType().contains("read")) {
@@ -118,10 +77,13 @@ public class SmartDaoDataSourceConfig {
 			for(int i=0;i<group.getReadDSList().size();i++) {
 				dsMap.put(group.getName()+"-read-"+i, group.getReadDSList().get(i));
 			}
-			SmartDatasourceHolder.getInstance().setDataSourceGroupMap(dsGroupsMap);
 		}
-		rds.setTargetDataSources(dsMap);
-		return rds;
+		SmartDatasourceHolder.getInstance().setDataSourceGroupMap(dsGroupsMap);
+		SmartDatasourceHolder.defaultDatasourceGroup=dsGroupsMap.keySet().iterator().next();
+		// targetDataSources里维护的是group打散后的数据源形式，也就是原始意义上的一个数据库代表一个数据源
+		srds.setTargetDataSources(dsMap);
+		SmartDatasourceHolder.srds = srds;
+		return srds;
 	}
 	
 	public void setDialect(String dialect) {

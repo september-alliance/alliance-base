@@ -42,6 +42,7 @@ public class SimpleWebSecurityConfiguration extends WebSecurityConfigurerAdapter
 	public void configure(WebSecurity web) throws Exception {
 		web.ignoring().antMatchers("/assets/**");
 		web.ignoring().antMatchers("/login");
+		web.ignoring().antMatchers("/favicon.ico");
 		// find Mapping with PublicMethod
 		RequestMappingHandlerMapping mapping = applicationContext.getBean(RequestMappingHandlerMapping.class);
 		Map<RequestMappingInfo, HandlerMethod> map = mapping.getHandlerMethods();

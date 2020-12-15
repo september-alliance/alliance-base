@@ -63,6 +63,11 @@ public class ParamMap extends HashMap<String ,Object>{
 		return map.put(key, value);
 	}
 	
+	public ParamMap add(String key, Object value) {
+		map.put(key, value);
+		return this;
+	}
+	
 	@Override
 	public Object remove(Object key) {
 		return map.remove(key);
