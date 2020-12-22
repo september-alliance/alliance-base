@@ -55,4 +55,8 @@ public class ImageCodeController {
 //    	SessionHelper.getSession().removeAttribute(KEY_PREFIX);
     	return StringExtUtil.safeEqualsIgnoreCase(code, toVerifyCode);
     }
+    
+    public static void expireCodeFromSession() {
+    	SessionHelper.getSession().removeAttribute(KEY_PREFIX);
+    }
 }
