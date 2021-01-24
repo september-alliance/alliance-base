@@ -180,6 +180,19 @@ public class CommonDao {
 		return result;
 	}
 	
+	public Map<String, Object> get(String tableName,String idColumn, Object id) {
+		if (id == null) {
+			return null;
+		}
+		SmartDatasourceHolder.switchToRead();
+		ParamMap pm = new ParamMap();
+		pm.put("tableName", tableName);
+		pm.put("idColumn", idColumn);
+		pm.put("idValue", id);
+		Map<String, Object> map = sqlSessionTemplate.selectOne("CommonEntityMapper.getById", pm);
+		return map;
+	}
+	
 	public <T> List<T> listByIds(Class<T> clazz , List<? extends Object> ids){
 	    if(CollectionUtils.isEmpty(ids)) {
 	        return new ArrayList<>();
