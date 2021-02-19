@@ -1,13 +1,16 @@
 package org.september.smartdao.datasource.config;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.tomcat.jdbc.pool.DataSource;
+import org.september.smartdao.config.CustomizeDataSourcePropertyProvider;
 import org.september.smartdao.datasource.SmartDatasourceHolder;
 import org.september.smartdao.datasource.SmartRoutingDataSource;
 import org.september.smartdao.util.DataSourceUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,20 +31,32 @@ public class SmartDaoDataSourceConfig {
 	private List<DataSourceProperty> datasource;
 	
 	private String dialect;
+	
+	@Autowired(required=false)
+	private CustomizeDataSourcePropertyProvider customizeDataSourcePropertyProvider;
 
 	@Bean(name = "dataSource", initMethod = "init")
 	public SmartRoutingDataSource dataSource() {
 		SmartRoutingDataSource srds = new SmartRoutingDataSource();
+		// targetDataSources里维护的是group打散后的数据源形式，也就是原始意义上的一个数据库代表一个数据源
+		Map<Object, Object> dsMap = new HashMap<>();
+		srds.setTargetDataSources(dsMap);
 		if(dialect==null){
-			throw new RuntimeException("forgot to config a dialect by spring.alliance.dao.dialect ?");
+			if(customizeDataSourcePropertyProvider==null) {
+				throw new RuntimeException("forgot to config a dialect by spring.alliance.dao.dialect ?");
+			}
+			dialect = customizeDataSourcePropertyProvider.getDialect();
 		}
 		srds.setDialect(dialect);
 		if(datasource==null || datasource.isEmpty()) {
-			throw new RuntimeException("forgot to config a datasource?");
+			if(customizeDataSourcePropertyProvider==null) {
+				throw new RuntimeException("forgot to config a datasource?");
+			}
+			datasource = new ArrayList<>();
+			datasource.add(customizeDataSourcePropertyProvider.getDataSourceProperty());
 		}
 		srds.setDataSourcePropertys(datasource);
 		//设置多个数据源
-		Map<Object, Object> dsMap = new HashMap<>();
 		Map<String , DataSourceGroup> dsGroupsMap = new HashMap<>();
 		for(DataSourceProperty dsp : datasource) {
 			if(StringUtils.isEmpty(dsp.getGroup())) {
@@ -80,8 +95,7 @@ public class SmartDaoDataSourceConfig {
 		}
 		SmartDatasourceHolder.getInstance().setDataSourceGroupMap(dsGroupsMap);
 		SmartDatasourceHolder.defaultDatasourceGroup=dsGroupsMap.keySet().iterator().next();
-		// targetDataSources里维护的是group打散后的数据源形式，也就是原始意义上的一个数据库代表一个数据源
-		srds.setTargetDataSources(dsMap);
+		
 		SmartDatasourceHolder.srds = srds;
 		return srds;
 	}
