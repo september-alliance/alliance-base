@@ -153,7 +153,7 @@ public class StringExtUtil {
 		}
 	}
 
-	private static final boolean isChinese(char c) {
+	public static final boolean isChinese(char c) {
 		Character.UnicodeBlock ub = Character.UnicodeBlock.of(c);
 		if (ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS
 				|| ub == Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS
@@ -166,6 +166,13 @@ public class StringExtUtil {
 		return false;
 	}
 
+	public static final boolean isLetter(char ch) {
+		if( (ch>='A' && ch<='Z') || (ch>='a' && ch<='z') ) {
+			return true;
+		}
+		return false;
+	}
+	
 	public static final boolean isAllChinese(String strName) {
 		if(isEmpty(strName)){
 			return false;
