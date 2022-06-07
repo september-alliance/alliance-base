@@ -23,6 +23,7 @@ import org.september.smartdao.util.ReflectHelper;
 import org.september.smartdao.util.SqlHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -42,13 +43,16 @@ public class CommonDao {
 	 * @Description:增加数据到数据库
 	 * @date 2017/12/22
 	 */
-	public void save(Object entity) {
+	public void save(Object entity , String tableName) {
 		try {
+			if(StringUtils.isEmpty(tableName)) {
+				throw new BusinessException("tablename should not be empty!");
+			}
 			SmartDatasourceHolder.switchToWrite();
 			List<QueryPair> queryPairList = SqlHelper.getQueryPairs(entity,true);
 			ParamMap pm = new ParamMap();
 			pm.put("columnList", queryPairList);
-			pm.put("tableName", SqlHelper.getTableName(entity.getClass()));
+			pm.put("tableName", tableName);
 			String keyName = SqlHelper.getIdOfClass(entity.getClass()).getName();
 			Sequence seq = SqlHelper.getIdOfClass(entity.getClass()).getAnnotation(Sequence.class);
 			AutoIncrease auto = SqlHelper.getIdOfClass(entity.getClass()).getAnnotation(AutoIncrease.class);
@@ -75,13 +79,22 @@ public class CommonDao {
 			throw new BusinessException("保存数据失败", e);
 		}
 	}
+	
+	public void save(Object entity) {
+		save(entity,SqlHelper.getTableName(entity.getClass()));
+	}
+	
 
+	public int update(Object entity) {
+		String tableName = SqlHelper.getTableName(entity.getClass());
+		return update(entity,tableName);
+	}
 	/**
 	 * @author yexinzhou
 	 * @Description:根据id(由注解 @Id 决定 ) 更新entity中不为null的值
 	 * @date 2017/12/22
 	 */
-	public int update(Object entity) {
+	public int update(Object entity,String tableName) {
 		try {
 			SmartDatasourceHolder.switchToWrite();
 			// 得到类中属性id
@@ -92,7 +105,11 @@ public class CommonDao {
 				if (val == null) {
 					throw new BusinessException("id can't be null when update");
 				}
-				return this.updateByField(entity.getClass(), id.getName(), val, entity, false);
+				
+				if(StringUtils.isEmpty(tableName)) {
+					tableName = SqlHelper.getTableName(entity.getClass());
+				}
+				return this.updateByField(entity.getClass(), id.getName(), val, entity, false,tableName);
 			}
 		} catch (IllegalAccessException e) {
 			throw new RuntimeException(e);
@@ -113,7 +130,8 @@ public class CommonDao {
 				if (val == null) {
 					throw new RuntimeException("id can't be null when update");
 				}
-				this.updateByField(entity.getClass(), id.getName(), val, entity, true);
+				String tableName = SqlHelper.getTableName(entity.getClass());
+				this.updateByField(entity.getClass(), id.getName(), val, entity, true,tableName);
 			}
 		} catch (IllegalAccessException e) {
 			throw new RuntimeException(e);
@@ -392,6 +410,11 @@ public class CommonDao {
 		return sqlSessionTemplate.update(statement, paramMap);
 	}
 
+	public <T> int updateByField(Class<T> clazz, String fieldName, Object fieldValue, Object updateObj,
+			boolean updateNull) {
+		String tableName = SqlHelper.getTableName(clazz);
+		return updateByField(clazz,fieldName,fieldValue,updateObj,updateNull,tableName);
+	}
 	/**
 	 * 根据给定的字段值更新数据，要更新的字段值在updateObj中所有不为null的字段
 	 *
@@ -405,8 +428,7 @@ public class CommonDao {
 	 * @date 2017年12月15日 下午1:24:53
 	 */
 	public <T> int updateByField(Class<T> clazz, String fieldName, Object fieldValue, Object updateObj,
-			boolean updateNull) {
-		String tableName = SqlHelper.getTableName(clazz);
+			boolean updateNull,String tableName) {
 		Field[] fields = SqlHelper.getFieldsWithoutTransient(clazz);
 		List<Map<String, Object>> columns = new ArrayList<Map<String, Object>>();
 		String whereColumnName = fieldName;

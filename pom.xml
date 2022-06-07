@@ -85,12 +85,12 @@
         <repository>
             <id>september</id>
             <name>Nexus Release Repository</name>
-            <url>http://120.92.166.27:9081/nexus/content/repositories/releases/</url>
+            <url>http://175.27.188.225:9081/nexus/content/repositories/releases/</url>
         </repository>
         <snapshotRepository>
             <id>september</id>
             <name>Nexus Snapshot Repository</name>
-            <url>http://120.92.166.27:9081/nexus/content/repositories/snapshots/</url>
+            <url>http://175.27.188.225:9081/nexus/content/repositories/snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 
@@ -98,7 +98,7 @@
 		<repository>
 			<id>september</id>
 			<name>Spring Snapshots</name>
-			<url>http://120.92.166.27:9081/nexus/content/groups/public/</url>
+			<url>http://175.27.188.225:9081/nexus/content/groups/public/</url>
 			<snapshots>
 				<enabled>true</enabled>
 			</snapshots>
