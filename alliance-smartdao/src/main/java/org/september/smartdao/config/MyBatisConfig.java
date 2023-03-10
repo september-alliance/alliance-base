@@ -87,7 +87,9 @@ public class MyBatisConfig implements TransactionManagementConfigurer {
             		resourcesList.addAll(resolverx.getResourcesList(resolver));
             	}
             }
-            
+            if(myBatisConfigManager!=null) {
+            	myBatisConfigManager.addMapperResources(resources1);
+            }
             org.springframework.core.io.Resource[] resources2 = resourcesList.toArray(new org.springframework.core.io.Resource[] {});
             int length = resources1.length + resourcesList.size();
             org.springframework.core.io.Resource[] resources = Arrays.copyOf(resources1, length);
