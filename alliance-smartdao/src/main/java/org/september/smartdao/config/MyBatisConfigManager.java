@@ -1,7 +1,9 @@
 package org.september.smartdao.config;
 
+import java.util.List;
+
 import org.apache.ibatis.session.Configuration;
-import org.mybatis.spring.SqlSessionFactoryBean;
+import org.springframework.core.io.Resource;
 
 /**
  * mybatis配置入口，业务系统需实现该接口,并注入到spring context中
@@ -16,7 +18,7 @@ public interface MyBatisConfigManager {
     	 return "classpath:/mybatis/mapper/**/*.xml";
      }
      
-     default void addMapperResources(org.springframework.core.io.Resource[] resList) {
+     default void addMapperResources(List<Resource> resList) {
      }
      public void config(Configuration myBatisCfg);
 }

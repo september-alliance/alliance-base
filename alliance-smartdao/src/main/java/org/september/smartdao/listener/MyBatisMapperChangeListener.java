@@ -201,13 +201,16 @@ public class MyBatisMapperChangeListener implements InitializingBean, Applicatio
                 if(path.contains("CommonEntityMapper.xml")){
                     continue;
                 }
-                String result = path.split("mapper")[0].split("\\[")[1]+"mapper";
-                if(!dirs.contains(result)){
-                    dirs.add(result);
-                    System.out.println("---------find mytabis mapper path-----------");
-                    System.out.println("---------"+result+"-----------");
+                try {
+                	String result = path.split("mapper")[0].split("\\[")[1]+"mapper";
+                    if(!dirs.contains(result)){
+                        dirs.add(result);
+                        System.out.println("---------find mytabis mapper path-----------");
+                        System.out.println("---------"+result+"-----------");
+                    }
+                }catch(Exception ex) {
+                	System.out.println("监听mapper文件路径 "+path+" 失败");
                 }
-                
             }
         }catch(Exception ex){
             ex.printStackTrace();
@@ -219,11 +222,16 @@ public class MyBatisMapperChangeListener implements InitializingBean, Applicatio
         try{
             Collection<File> dirList = new ArrayList<File>();
             for(String rootDir : getMapperDir()){
-                Collection<File> dirs = FileUtils.listFilesAndDirs(new File(rootDir),FalseFileFilter.INSTANCE,TrueFileFilter.INSTANCE);
-                dirList.addAll(dirs);
+            	try {
+	                Collection<File> dirs = FileUtils.listFilesAndDirs(new File(rootDir),FalseFileFilter.INSTANCE,TrueFileFilter.INSTANCE);
+	                dirList.addAll(dirs);
+            	}catch(Exception ex) {
+            		System.out.println("忽略监听目录:"+rootDir);
+            	}
             }
             return dirList;
         }catch(Exception ex){
+        	ex.printStackTrace();
             System.out.println("获取mapper文件目录失败，如果你正在使用tomcat调试，请使用jetty即可。");
             return new ArrayList<File>();
         }

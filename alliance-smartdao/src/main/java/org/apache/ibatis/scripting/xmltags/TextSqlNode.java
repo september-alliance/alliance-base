@@ -38,8 +38,8 @@ public class TextSqlNode implements SqlNode {
 	  public boolean apply(DynamicContext context) {
 	    GenericTokenParser parser = createParser(new BindingTokenParser(context, injectionFilter));
 	    Object _parameter = context.getBindings().get("_parameter");
-		if(_parameter instanceof Map){
-			Map map = (Map)_parameter;
+		if(_parameter instanceof ParamMap){
+			ParamMap map = (ParamMap)_parameter;
 			if(map!=null && Boolean.TRUE.equals(map.get(ParamMap.Smart_Sql))){
 				String sql = SmartSqlOptimizer.optimize(text, (ParamMap)map);
 				context.appendSql(parser.parse(sql));
