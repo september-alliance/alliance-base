@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.tomcat.jdbc.pool.DataSource;
+import org.september.core.component.log.LogHelper;
 import org.september.smartdao.config.CustomizeDataSourcePropertyProvider;
 import org.september.smartdao.datasource.SmartDatasourceHolder;
 import org.september.smartdao.datasource.SmartRoutingDataSource;
@@ -28,6 +29,8 @@ import org.springframework.util.StringUtils;
 @ConfigurationProperties(prefix = "spring.alliance.dao")
 public class SmartDaoDataSourceConfig {
 	
+	private LogHelper logHelper = LogHelper.getLogger(this.getClass());
+	
 	private List<DataSourceProperty> datasource;
 	
 	private String dialect;
@@ -49,11 +52,12 @@ public class SmartDaoDataSourceConfig {
 		}
 		srds.setDialect(dialect);
 		if(datasource==null || datasource.isEmpty()) {
-			if(customizeDataSourcePropertyProvider==null) {
-				throw new RuntimeException("forgot to config a datasource?");
-			}
 			datasource = new ArrayList<>();
-			datasource.add(customizeDataSourcePropertyProvider.getDataSourceProperty());
+			if(customizeDataSourcePropertyProvider==null) {
+				logHelper.getBuilder().info("forgot to config a datasource?");
+			}else {
+				datasource.add(customizeDataSourcePropertyProvider.getDataSourceProperty());
+			}
 		}
 		srds.setDataSourcePropertys(datasource);
 		//设置多个数据源
@@ -94,7 +98,9 @@ public class SmartDaoDataSourceConfig {
 			}
 		}
 		SmartDatasourceHolder.getInstance().setDataSourceGroupMap(dsGroupsMap);
-		SmartDatasourceHolder.defaultDatasourceGroup=dsGroupsMap.keySet().iterator().next();
+		if(!dsGroupsMap.isEmpty()) {
+			SmartDatasourceHolder.defaultDatasourceGroup=dsGroupsMap.keySet().iterator().next();
+		}
 		
 		SmartDatasourceHolder.srds = srds;
 		return srds;

@@ -16,6 +16,8 @@ public class DataSourceProperty {
 	 */
 	private String type;
 	
+	private boolean enable = true;
+	
 	private int weight;
 	
 	// 一下为tomcat 连接池配置
@@ -352,6 +354,11 @@ public class DataSourceProperty {
 	public void setUseStatementFacade(boolean useStatementFacade) {
 		this.useStatementFacade = useStatementFacade;
 	}
-	
+	public boolean isEnable() {
+		return enable;
+	}
+	public void setEnable(boolean enable) {
+		this.enable = enable;
+	}
 	
 }

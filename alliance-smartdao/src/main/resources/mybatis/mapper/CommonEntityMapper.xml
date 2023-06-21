@@ -91,6 +91,22 @@
         )
     </insert>
     
+    <!-- sqlserver -->
+    <insert id="insertMSEntityAutoIncrease" parameterType="org.september.smartdao.model.ParamMap">
+        insert into ${tableName} (
+        <foreach collection="columnList" item="queryPair" index="index1" separator=",">
+            ${queryPair.columnName}
+        </foreach>
+        )values(
+        <foreach collection="columnList" item="queryPair" index="index3" separator=",">
+            #{queryPair.columnValue}
+        </foreach>
+        )
+        <selectKey resultType="java.lang.Long" keyProperty="id"      order="AFTER">
+            select IDENT_CURRENT('${tableName}')
+        </selectKey>
+    </insert>
+    
     <insert id="insertEntityWithSequence" parameterType="org.september.smartdao.model.ParamMap">
         <selectKey resultType="java.lang.Long" keyProperty="id"      order="BEFORE">
             ${selectKey}

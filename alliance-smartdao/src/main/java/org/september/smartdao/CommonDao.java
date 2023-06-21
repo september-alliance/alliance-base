@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.tomcat.jdbc.pool.DataSource;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.september.core.exception.BusinessException;
 import org.september.smartdao.anno.AutoIncrease;
@@ -62,7 +63,12 @@ public class CommonDao {
 				long id = (long) pm.get("id");
 				BeanUtils.setProperty(entity, keyName, id);
 			} else if (auto != null) {
-				sqlSessionTemplate.insert("CommonEntityMapper.insertEntityAutoIncrease", pm);
+				DataSource ds = SmartDatasourceHolder.getCurrentDataSource();
+				if(ds.getUrl().contains("mysql")) {
+					sqlSessionTemplate.insert("CommonEntityMapper.insertEntityAutoIncrease", pm);
+				}else if(ds.getUrl().contains("sqlserver")) {
+					sqlSessionTemplate.insert("CommonEntityMapper.insertMSEntityAutoIncrease", pm);
+				}
 				long id = (long) pm.get("id");
 				BeanUtils.setProperty(entity, keyName, id);
 			} else {

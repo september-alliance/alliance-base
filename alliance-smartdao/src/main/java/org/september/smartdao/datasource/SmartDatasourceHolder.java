@@ -1,5 +1,6 @@
 package org.september.smartdao.datasource;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -55,6 +56,15 @@ public class SmartDatasourceHolder {
 			return group.getName() + "-write";
 		}
 	}
+	
+	public static DataSource getCurrentDataSource() {
+		String key = currentDataSourceGroup.get();
+		if (key == null) {
+			key = defaultDatasourceGroup;
+		}
+		DataSourceGroup group = dsGroupMap.get(key);
+		return group.getWriteDS();
+	}
 
 	public static void switchToWrite() {
 		if (datasourceLock.get() != null && datasourceLock.get() == true) {
@@ -87,7 +97,7 @@ public class SmartDatasourceHolder {
 	 * @param username
 	 * @param password
 	 */
-	public static void addMySQLDataSource(String groupName, String jdbcUrl,String username,String password) {
+	public static void addMySQLDataSource(String groupName, String jdbcUrl,String username,String password,String driver) {
 		if(StringUtils.isEmpty(groupName)) {
 			throw new BusinessException("数据源名不能为空");
 		}
@@ -96,7 +106,7 @@ public class SmartDatasourceHolder {
 		
 		DataSourceProperty dsp = new DataSourceProperty();
 		dsp.setJdbcUrl(jdbcUrl);
-		dsp.setDriverClass("com.mysql.cj.jdbc.Driver");
+		dsp.setDriverClass(driver);
 		dsp.setUsername(username);
 		dsp.setPassword(password);
 		
@@ -109,6 +119,9 @@ public class SmartDatasourceHolder {
 		
 		dsGroupMap.put(groupName, group);
 		srds.addDataSourceGroup(group);
+		if("".equals(defaultDatasourceGroup)) {
+			defaultDatasourceGroup = groupName;
+		}
 	}
 	
 	/**
@@ -133,5 +146,9 @@ public class SmartDatasourceHolder {
 
 	public static void releaseDataSourceLock() {
 		datasourceLock.set(false);
+	}
+	
+	public static Collection<DataSourceGroup> getDataSourceGroups() {
+		return dsGroupMap.values();
 	}
 }
