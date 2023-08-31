@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>alliance-agent</artifactId>
+	<packaging>jar</packaging>
+
+	<name>alliance-agent</name>
+	<description>A base and common java agent for alliance stack </description>
+
+	<parent>
+		<groupId>org.september</groupId>
+		<artifactId>alliance-base</artifactId>
+		<version>2.3.3-SNAPSHOT</version>
+	</parent>
+	<properties>
+	</properties>
+
+	<dependencies>
+		<dependency>
+		    <groupId>org.ow2.asm</groupId>
+		    <artifactId>asm</artifactId>
+		    <version>9.4</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.ow2.asm</groupId>
+		    <artifactId>asm-commons</artifactId>
+		    <version>9.4</version>
+		</dependency>
+		
+	</dependencies>
+
+	<build>
+		
+		<plugins>
+		    <plugin>
+		      <groupId>org.apache.maven.plugins</groupId>
+		      <artifactId>maven-assembly-plugin</artifactId>
+		      <configuration>
+		        <descriptorRefs>
+		          <!--将应用的所有依赖包都打到jar包中。如果依赖的是 jar 包，jar 包会被解压开-->
+		          <descriptorRef>jar-with-dependencies</descriptorRef>
+		        </descriptorRefs>
+		        <archive>
+		          <manifestEntries>
+		            // 指定premain()的所在方法
+		            <Agent-CLass>org.september.agent.AgentMain</Agent-CLass>
+		            <Premain-Class>org.september.agent.AgentMain</Premain-Class>
+		            <Can-Redefine-Classes>true</Can-Redefine-Classes>
+		            <Can-Retransform-Classes>true</Can-Retransform-Classes>
+		          </manifestEntries>
+		        </archive>
+		      </configuration>
+		      <executions>
+		        <execution>
+		          <phase>package</phase>
+		          <goals>
+		            <goal>single</goal>
+		          </goals>
+		        </execution>
+		      </executions>
+		    </plugin>
+		  </plugins>
+    </build>
+</project>
