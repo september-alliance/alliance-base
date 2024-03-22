@@ -1,10 +1,7 @@
 package org.september.simpleweb.exception;
 
 import java.io.IOException;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.ValidationException;
+import java.util.Map;
 
 import org.september.core.component.log.LogHelper;
 import org.september.core.exception.BusinessException;
@@ -20,9 +17,15 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import com.alibaba.fastjson.JSON;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.ValidationException;
 
 @ControllerAdvice
 public class DefaultExceptionHandler {
@@ -79,21 +82,30 @@ public class DefaultExceptionHandler {
      * @throws Exception
      */
    @ExceptionHandler(value = Exception.class)
-    public ModelAndView defaultErrorHandler(Exception e , HttpServletRequest request, HttpServletResponse response , HandlerMethod handler){
+    public ModelAndView defaultErrorHandler(Exception e , HttpServletRequest request, HttpServletResponse response ){
 	   logger.getBuilder().warn("系统内部异常",e);
-	   ResponseBody anno = handler.getMethodAnnotation(ResponseBody.class);
+	   HandlerMethod handlerMethod = null;
+	   Map<String, Object> pathVariables = (Map<String, Object>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+	   if(request.getAttribute(HandlerMapping.BEST_MATCHING_HANDLER_ATTRIBUTE) instanceof HandlerMethod) {
+		   handlerMethod = (HandlerMethod) request.getAttribute(HandlerMapping.BEST_MATCHING_HANDLER_ATTRIBUTE);
+	   }
        boolean isXhr=false;
-       if(anno!=null){
-           isXhr = true;
+       if(handlerMethod!=null) {
+    	   ResponseBody anno = handlerMethod.getMethodAnnotation(ResponseBody.class);
+	         if(anno!=null){
+	         isXhr = true;
+	     }
        }
-	   
+
        if(isXhr) {
     	   ResponseVo<String> respVo = ResponseVo.<String>BUILDER().setCode(ResponseVo.BUSINESS_CODE.FAILED).setErrorType(Error_Type.UnExpect_Exception).setDesc(e.getMessage());
     	   responseAjax(response , respVo);
     	   return null;
        }else {
     	   ModelAndView modelAndView = new ModelAndView();
-    	   if(e instanceof NotAuthorizedException) {
+    	   if(e instanceof NoResourceFoundException) {
+    		   modelAndView.setViewName("404");
+    	   }else if(e instanceof NotAuthorizedException) {
     		   modelAndView.setViewName("503");
     	   }else {
     		   modelAndView.setViewName("500");

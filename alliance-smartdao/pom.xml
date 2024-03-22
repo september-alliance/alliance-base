@@ -12,7 +12,7 @@
 	<parent>
 		<groupId>org.september</groupId>
 		<artifactId>alliance-base</artifactId>
-		<version>2.3.3-SNAPSHOT</version>
+		<version>3.0.0-SNAPSHOT</version>
 	</parent>
 
 	<properties>
@@ -30,7 +30,7 @@
 		<dependency>
 			<groupId>org.mybatis.spring.boot</groupId>
 			<artifactId>mybatis-spring-boot-starter</artifactId>
-			<version>1.3.2</version>
+			<version>3.0.3</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.mybatis.spring.boot</groupId>
@@ -44,7 +44,10 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
 		</dependency>
 		
 		<dependency>
@@ -68,6 +71,7 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
+			<version>8.0.33</version>
 			<scope>runtime</scope>
 		</dependency>
 		
@@ -81,8 +85,10 @@
 		<dependency>
 			<groupId>org.september</groupId>
 			<artifactId>alliance-core</artifactId>
-			<version>2.3.3-SNAPSHOT</version>
+			<version>3.0.0-SNAPSHOT</version>
 		</dependency>
+		
+		
 	</dependencies>
 
 	<build>

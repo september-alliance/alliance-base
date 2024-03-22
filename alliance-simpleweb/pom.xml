@@ -10,7 +10,7 @@
 	<parent>
 		<groupId>org.september</groupId>
 		<artifactId>alliance-base</artifactId>
-		<version>2.3.3-SNAPSHOT</version>
+		<version>3.0.0-SNAPSHOT</version>
 	</parent>
 
 	<properties>
@@ -48,7 +48,7 @@
 		<dependency>
 			<groupId>org.september</groupId>
 			<artifactId>alliance-core</artifactId>
-			<version>2.3.3-SNAPSHOT</version>
+			<version>3.0.0-SNAPSHOT</version>
 		</dependency>
 		
 	</dependencies>

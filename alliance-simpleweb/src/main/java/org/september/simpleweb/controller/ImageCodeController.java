@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import javax.imageio.ImageIO;
-import javax.servlet.http.HttpServletResponse;
 
 import org.september.core.util.ImageCodeUtil;
 import org.september.core.util.StringExtUtil;
@@ -15,6 +14,8 @@ import org.september.simpleweb.utils.SessionHelper;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 @PublicMethod
 @Controller

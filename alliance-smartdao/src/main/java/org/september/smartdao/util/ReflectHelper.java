@@ -102,7 +102,10 @@ public class ReflectHelper {
                 }else if (value instanceof Timestamp) {
                 	Timestamp tvalue = (Timestamp)value;
                     field.set(dest, new java.util.Date(tvalue.getTime()));
-                }else if (field.getType().isEnum()) {
+                }else if(value instanceof LocalDateTime) {
+                	Timestamp ts = Timestamp.valueOf((LocalDateTime) value);
+                    field.set(dest, new java.util.Date(ts.getTime()));
+                } else if (field.getType().isEnum()) {
                     field.set(dest, field.getType().getEnumConstants()[(int)value]);
                 }else {
                     field.set(dest, value);

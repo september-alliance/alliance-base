@@ -6,11 +6,10 @@
 	<artifactId>alliance-pojo</artifactId>
 	<packaging>jar</packaging>
 	<description>basic pojo</description>
-
 	<parent>
 		<groupId>org.september</groupId>
 		<artifactId>alliance-base</artifactId>
-		<version>2.3.3-SNAPSHOT</version>
+		<version>3.0.0-SNAPSHOT</version>
 	</parent>
 	<properties>
 	</properties>
@@ -20,5 +19,7 @@
 	</dependencies>
 
 	<build>
+		<plugins>
+		</plugins>
     </build>
 </project>

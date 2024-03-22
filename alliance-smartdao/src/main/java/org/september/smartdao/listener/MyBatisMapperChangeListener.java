@@ -122,10 +122,14 @@ public class MyBatisMapperChangeListener implements InitializingBean, Applicatio
         	 Map mapper = (Map) field.get(configuration);
         	 List targetList = new ArrayList();
              for(Object key : mapper.keySet()) {
-             	MappedStatement ms = (MappedStatement)mapper.get(key);
-             	if(!ms.getId().startsWith("CommonEntityMapper")) {
-             		targetList.add(key);
-             	}
+            	 try {
+            		 MappedStatement ms = (MappedStatement)mapper.get(key);
+                  	if(!ms.getId().startsWith("CommonEntityMapper")) {
+                  		targetList.add(key);
+                  	}
+            	 }catch(IllegalArgumentException ex) {
+            		 //ignore
+            	 }
              }
              
              for(Object key : targetList) {
@@ -146,7 +150,10 @@ public class MyBatisMapperChangeListener implements InitializingBean, Applicatio
         private List<Resource> findResource(List<String> dirs) throws IOException {
             List<Resource> resources = new ArrayList<Resource>();
             for(String path : dirs){
-                resources.addAll(findResource(path));
+            	File f = new File(path);
+            	if(f.isDirectory()) {
+            		resources.addAll(findResource(path));
+            	}
             }
             return resources;
         }

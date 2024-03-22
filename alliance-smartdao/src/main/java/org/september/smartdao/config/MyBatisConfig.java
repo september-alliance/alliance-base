@@ -80,7 +80,7 @@ public class MyBatisConfig implements TransactionManagementConfigurer {
             }
             resources1 = list.toArray(new org.springframework.core.io.Resource[]{});
             List<org.springframework.core.io.Resource> resourcesList = new ArrayList<>();
-            resourcesList.add(resolver.getResource("classpath:/mybatis/mapper/CommonEntityMapper.xml"));
+            resourcesList.add(resolver.getResource("classpath:mybatis/mapper/CommonEntityMapper.xml"));
             
             if(applicationContextHolder.getContext().getBeansOfType(MyBatisResourceCustomerResolver.class)!=null) {
             	for(MyBatisResourceCustomerResolver resolverx : applicationContextHolder.getContext().getBeansOfType(MyBatisResourceCustomerResolver.class).values()) {

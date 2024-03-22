@@ -6,4 +6,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ComponentScan("org.september.smartdao")
 public class SmartDaoAutoConfig {
+	public SmartDaoAutoConfig() {
+		System.out.println();
+	}
 }
