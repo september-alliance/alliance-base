@@ -212,8 +212,8 @@ public class MyBatisMapperChangeListener implements InitializingBean, Applicatio
                 	String result = path.split("mapper")[0].split("\\[")[1]+"mapper";
                     if(!dirs.contains(result)){
                         dirs.add(result);
-                        System.out.println("---------find mytabis mapper path-----------");
-                        System.out.println("---------"+result+"-----------");
+//                        System.out.println("---------find mytabis mapper path-----------");
+//                        System.out.println("---------"+result+"-----------");
                     }
                 }catch(Exception ex) {
                 	System.out.println("监听mapper文件路径 "+path+" 失败");
@@ -274,7 +274,7 @@ public class MyBatisMapperChangeListener implements InitializingBean, Applicatio
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-
+//                System.out.println(key);
                 List<WatchEvent<?>> events = key.pollEvents();
                 //如果监控到mapper文件修改事件 poll出事件
                 for (WatchEvent<?> event: events) {

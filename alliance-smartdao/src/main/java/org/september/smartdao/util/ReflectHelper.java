@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.september.core.component.log.LogHelper;
+import org.september.smartdao.CommonDaoHolder;
+import org.september.smartdao.config.FieldDataConverter;
 
 /**
  * 说明：反射工具
@@ -58,17 +60,23 @@ public class ReflectHelper {
     }
 
     private static void setProperties(Object dest, Map<String , Object> origin) throws IllegalArgumentException, IllegalAccessException {
-        origin = SqlHelper.dbFieldToEntityField(dest.getClass(), origin);
+    	origin = CommonDaoHolder.getCommonDao().getSqlHelper().dbFieldToEntityField(dest.getClass(), origin);
         Field[] fieldList= getAllDeclaredFields(dest.getClass());
 
+        Object value = null;
         for (Field field : fieldList) {
+        	try {
             String name = field.getName();
-            Object value = origin.get(name);
+            value = origin.get(name);
             if (value == null) {
                 value = origin.get(name.toUpperCase());
             }
             field.setAccessible(true);
             if (value != null) {
+            	FieldDataConverter converter = CommonDaoHolder.getCommonDao().getFieldDataConverter();
+            	if(converter!=null) {
+            		value = converter.convert(value);
+            	}
             	//boolean 转 int
 //            	if(value instanceof Boolean) {
 //            		if((Boolean)value) {
@@ -107,11 +115,22 @@ public class ReflectHelper {
                     field.set(dest, new java.util.Date(ts.getTime()));
                 } else if (field.getType().isEnum()) {
                     field.set(dest, field.getType().getEnumConstants()[(int)value]);
-                }else {
+                }else if( value instanceof Short) {
+                	Short v = (Short)value;
+                	if(field.getType().equals(Integer.class)) {
+                		field.set(dest, v.intValue());
+                	}else {
+                		field.set(dest, v);
+                	}
+                }
+                else {
                     field.set(dest, value);
                 }
 
             }
+        	}catch(Exception ex) {
+        		throw new RuntimeException("field type convert error", ex);
+        	}
         }
     }
 
@@ -123,7 +142,7 @@ public class ReflectHelper {
             T entity = clazz.newInstance();
             setProperties(entity, map);
             return entity;
-        } catch (InstantiationException | IllegalAccessException e) {
+        } catch (Exception e) {
             throw new RuntimeException("try to wrap entity " + clazz.getName() + " failed", e);
         }
     }

@@ -1,15 +1,16 @@
 package org.september.smartdao.util;
 
-import org.apache.tomcat.jdbc.pool.DataSource;
+import org.september.smartdao.datasource.MyDataSource;
 import org.september.smartdao.datasource.config.DataSourceProperty;
 
 public class DataSourceUtil {
 
-	public static void copyProps(DataSourceProperty from , DataSource to) {
+	public static void copyProps(DataSourceProperty from , MyDataSource to) {
 		to.setUrl(from.getJdbcUrl());
 		to.setDriverClassName(from.getDriverClass());
 		to.setUsername(from.getUsername());
 		to.setPassword(from.getPassword());
+		to.setShcema(from.getSchema());
 		
 		to.setAbandonWhenPercentageFull(from.getAbandonWhenPercentageFull());
 		to.setAccessToUnderlyingConnectionAllowed(from.isAccessToUnderlyingConnectionAllowed());

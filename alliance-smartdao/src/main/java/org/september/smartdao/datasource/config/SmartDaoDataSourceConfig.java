@@ -8,6 +8,7 @@ import java.util.Map;
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.september.core.component.log.LogHelper;
 import org.september.smartdao.config.CustomizeDataSourcePropertyProvider;
+import org.september.smartdao.datasource.MyDataSource;
 import org.september.smartdao.datasource.SmartDatasourceHolder;
 import org.september.smartdao.datasource.SmartRoutingDataSource;
 import org.september.smartdao.util.DataSourceUtil;
@@ -72,8 +73,7 @@ public class SmartDaoDataSourceConfig {
 				dsGroupsMap.put(dsg.getName(), dsg);
 			}
 			DataSourceGroup group = dsGroupsMap.get(dsp.getGroup());
-			DataSource ds = new DataSource();
-			
+			MyDataSource ds = new MyDataSource();
 			DataSourceUtil.copyProps(dsp, ds);
 			
 			if(dsp.getType()!=null) {

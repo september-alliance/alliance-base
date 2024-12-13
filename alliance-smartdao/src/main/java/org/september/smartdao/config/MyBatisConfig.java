@@ -47,7 +47,6 @@ public class MyBatisConfig implements TransactionManagementConfigurer {
         configuration.setCacheEnabled(false);
         configuration.setUseGeneratedKeys(true);
         configuration.setCallSettersOnNulls(true);
-        configuration.setMapUnderscoreToCamelCase(true);
         configuration.setLogPrefix("dao.");
         configuration.setDefaultExecutorType(ExecutorType.REUSE);
         configuration.getTypeAliasRegistry().registerAlias("ParamMap", ParamMap.class);

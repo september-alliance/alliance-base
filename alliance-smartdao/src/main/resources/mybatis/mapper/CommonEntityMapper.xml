@@ -80,11 +80,11 @@
         <selectKey resultType="java.lang.Long" keyProperty="id"      order="AFTER">
             SELECT LAST_INSERT_ID()
         </selectKey>
-        insert into ${tableName} (id,
+        insert into ${tableName} (
         <foreach collection="columnList" item="queryPair" index="index1" separator=",">
             ${queryPair.columnName}
         </foreach>
-        )values(#{id,jdbcType=BIGINT},
+        )values(
         <foreach collection="columnList" item="queryPair" index="index3" separator=",">
             #{queryPair.columnValue}
         </foreach>

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.tomcat.jdbc.pool.DataSource;
+import org.september.smartdao.datasource.MyDataSource;
 
 /**
  * 数据源组，维护了一个写库，和多个读库。
@@ -14,9 +15,9 @@ public class DataSourceGroup {
 
 	private String name;
 	
-	private DataSource writeDS;
+	private MyDataSource writeDS;
 	
-	private List<DataSource> readDSList = new ArrayList<>();
+	private List<MyDataSource> readDSList = new ArrayList<>();
 
 	public String getName() {
 		return name;
@@ -26,19 +27,19 @@ public class DataSourceGroup {
 		this.name = name;
 	}
 
-	public DataSource getWriteDS() {
+	public MyDataSource getWriteDS() {
 		return writeDS;
 	}
 
-	public void setWriteDS(DataSource writeDS) {
+	public void setWriteDS(MyDataSource writeDS) {
 		this.writeDS = writeDS;
 	}
 
-	public List<DataSource> getReadDSList() {
+	public List<MyDataSource> getReadDSList() {
 		return readDSList;
 	}
 
-	public void setReadDSList(List<DataSource> readDSList) {
+	public void setReadDSList(List<MyDataSource> readDSList) {
 		this.readDSList = readDSList;
 	}
 }

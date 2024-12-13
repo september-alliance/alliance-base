@@ -35,4 +35,13 @@ public class RequestUtil {
 		}
 		return returnMap;
 	}
+	
+	public static boolean checkIfAjax(HttpServletRequest request) {
+        String xRequestedWith = request.getHeader("X-Requested-With");
+        if ("XMLHttpRequest".equals(xRequestedWith)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

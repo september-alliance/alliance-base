@@ -17,9 +17,9 @@ import org.september.smartdao.model.QueryPair;
 
 public class SqlHelper {
 
-    private static final LogHelper Logger = LogHelper.getLogger(SqlHelper.class);
+    private static final LogHelper logger = LogHelper.getLogger(SqlHelper.class);
 
-    public static String getTableName(Class<?> clazz) {
+    public String getTableName(Class<?> clazz) {
         String tableName = clazz.getSimpleName();
         Table tableAno = clazz.getAnnotation(Table.class);
         if (tableAno != null) {
@@ -28,10 +28,10 @@ public class SqlHelper {
         return tableName.toLowerCase();
     }
 
-    public static List<QueryPair> getQueryPairs(Object parameterObject) {
+    public List<QueryPair> getQueryPairs(Object parameterObject) {
     	return getQueryPairs(parameterObject , false);
     }
-    public static List<QueryPair> getQueryPairs(Object parameterObject,boolean defaultValue) {
+    public List<QueryPair> getQueryPairs(Object parameterObject,boolean defaultValue) {
     	List<QueryPair> result = new ArrayList<QueryPair>();
     	if(parameterObject==null){
     		return result;
@@ -82,7 +82,7 @@ public class SqlHelper {
         return result;
     }
 
-    public static String getColumnName(Field field) {
+    public String getColumnName(Field field) {
         Column colAno = field.getAnnotation(Column.class);
         if (colAno == null) {
             return field.getName();
@@ -91,12 +91,20 @@ public class SqlHelper {
         }
     }
 
-    public static Map<String,Object> dbFieldToEntityField(Class<?> clazz, Map<String,Object> dbData) throws SecurityException {
+    public Map<String,Object> dbFieldToEntityField(Class<?> clazz, Map<String,Object> dbData) throws SecurityException {
         Map<String,Object> result = new HashMap<>();
         for (String key : dbData.keySet()) {
             Field field = getFieldWithAnnotationColumnName(clazz, key.toString());
             if (field == null) {
-                result.put(key, dbData.get(key));
+            	//兼容开启自动转驼峰的情况，把驼峰格式再转会下划线格式。
+            	String snakeName = camelToSnake(key.toString());
+            	field = getFieldWithAnnotationColumnName(clazz, snakeName);
+            	if(field!=null) {
+            		result.put(field.getName(), dbData.get(key));
+            	}else {
+            		logger.getBuilder().error(key.toString()+"与实体类字段不匹配");
+            	}
+                
             }else{
             	result.put(field.getName(), dbData.get(key));
             }
@@ -104,7 +112,7 @@ public class SqlHelper {
         return result;
     }
 
-    public static Field[] getFieldsWithoutTransient(Class<?> clazz) {
+    public Field[] getFieldsWithoutTransient(Class<?> clazz) {
         Field[] fields = ReflectHelper.getAllDeclaredFields(clazz);
         List<Field> result = new ArrayList<Field>();
         for (int i = 0; i < fields.length; i++) {
@@ -116,7 +124,7 @@ public class SqlHelper {
         return result.toArray(new Field[] {});
     }
 
-    public static boolean isAutoInstreaseField(Field field) {
+    public boolean isAutoInstreaseField(Field field) {
         if (field == null) {
             return false;
         }
@@ -128,7 +136,7 @@ public class SqlHelper {
         }
     }
 
-    public static boolean isIdField(Field field) {
+    public boolean isIdField(Field field) {
         if (field == null) {
             return false;
         }
@@ -140,11 +148,11 @@ public class SqlHelper {
         }
     }
 
-    public static Field getIdOfEntity(Object obj) {
+    public Field getIdOfEntity(Object obj) {
         return getIdOfClass(obj.getClass());
     }
 
-    public static Field getIdOfClass(Class<?> clazz) {
+    public Field getIdOfClass(Class<?> clazz) {
         for (Field field : clazz.getDeclaredFields()) {
             Id idAno = field.getAnnotation(Id.class);
             if (idAno != null) {
@@ -157,11 +165,11 @@ public class SqlHelper {
         throw new RuntimeException("Id not found for " + clazz);
     }
 
-    public static String getIdColumnOfEntity(Object obj) {
+    public String getIdColumnOfEntity(Object obj) {
         return getIdColumnOfClass(obj.getClass());
     }
 
-    public static String getIdColumnOfClass(Class<?> clazz) {
+    public String getIdColumnOfClass(Class<?> clazz) {
         for (Field field : clazz.getDeclaredFields()) {
             Id idAno = field.getAnnotation(Id.class);
             if (idAno != null) {
@@ -176,16 +184,44 @@ public class SqlHelper {
         throw new RuntimeException("Id not found for " + clazz);
     }
 
-    private static Field getFieldWithAnnotationColumnName(Class clazz, String annoName) {
-        for (Field f : clazz.getDeclaredFields()) {
+    protected Field getFieldWithAnnotationColumnName(Class clazz, String dbName) {
+        for (Field f : getAllDeclaredFields(clazz)) {
             Column anno = f.getAnnotation(Column.class);
             if (anno == null) {
+            	if(f.getName().equals(dbName)) {
+            		return f;
+            	}
                 continue;
             }
-            if (annoName.equals(anno.name())) {
+            if (dbName.equals(anno.name())) {
                 return f;
             }
         }
         return null;
+    }
+    
+    protected List<Field> getAllDeclaredFields(Class clazz){
+    	List<Field> result = new ArrayList<>();
+    	 while (clazz != null) {
+    		 if(clazz.equals(Object.class)) {
+    			 break;
+    		 }
+             Field[] fields = clazz.getDeclaredFields(); // 获取当前类声明的所有字段
+             for (Field field : fields) {
+            	 result.add(field);
+             }
+             // 获取当前类的父类
+             clazz = clazz.getSuperclass();
+         }
+    	 return result;
+    }
+    
+    public static String camelToSnake(String input) {
+        if (input == null || input.isEmpty()) {
+            return input;
+        }
+        
+        // 使用正则表达式进行转换
+        return input.replaceAll("([a-z])([A-Z])", "$1_$2").toLowerCase();
     }
 }

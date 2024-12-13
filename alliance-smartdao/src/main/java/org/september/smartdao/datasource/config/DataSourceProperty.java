@@ -8,6 +8,7 @@ public class DataSourceProperty {
 	
 	private String group;
 	private String jdbcUrl;
+	private String schema;
 	
 	/**
 	 * read
@@ -359,6 +360,12 @@ public class DataSourceProperty {
 	}
 	public void setEnable(boolean enable) {
 		this.enable = enable;
+	}
+	public String getSchema() {
+		return schema;
+	}
+	public void setSchema(String schema) {
+		this.schema = schema;
 	}
 	
 }

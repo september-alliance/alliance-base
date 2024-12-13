@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-import org.apache.tomcat.jdbc.pool.DataSource;
 import org.september.core.exception.BusinessException;
 import org.september.smartdao.datasource.config.DataSourceGroup;
 import org.september.smartdao.datasource.config.DataSourceProperty;
@@ -57,7 +56,7 @@ public class SmartDatasourceHolder {
 		}
 	}
 	
-	public static DataSource getCurrentDataSource() {
+	public static MyDataSource getCurrentDataSource() {
 		String key = currentDataSourceGroup.get();
 		if (key == null) {
 			key = defaultDatasourceGroup;
@@ -98,7 +97,7 @@ public class SmartDatasourceHolder {
 	 * @param password
 	 */
 	public static void addMySQLDataSource(String groupName, String jdbcUrl,String username,String password,String driver) {
-		if(StringUtils.isEmpty(groupName)) {
+		if(!StringUtils.hasText(groupName)) {
 			throw new BusinessException("数据源名不能为空");
 		}
 		DataSourceGroup group = new DataSourceGroup();
@@ -110,7 +109,7 @@ public class SmartDatasourceHolder {
 		dsp.setUsername(username);
 		dsp.setPassword(password);
 		
-		DataSource ds = new DataSource();
+		MyDataSource ds = new MyDataSource();
 		
 		DataSourceUtil.copyProps(dsp, ds);
 		

@@ -54,8 +54,7 @@ public class MD5 {
 	}
 	
 	public static void main(String[] args) {
-		System.out.println(UUID.randomUUID());
-		System.out.println(md5("31119@qq.com"+"123456"));
+		System.out.println(md5WithDefaultSalt("2wsx3edc"));
 		System.out.println(md5("1"));
 	}
 }

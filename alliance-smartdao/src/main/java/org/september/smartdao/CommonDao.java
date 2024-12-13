@@ -15,11 +15,13 @@ import org.september.smartdao.anno.AutoIncrease;
 import org.september.smartdao.anno.IntegerDefaultValue;
 import org.september.smartdao.anno.OptimisticLock;
 import org.september.smartdao.anno.Sequence;
+import org.september.smartdao.config.FieldDataConverter;
 import org.september.smartdao.datasource.SmartDatasourceHolder;
 import org.september.smartdao.model.Order;
 import org.september.smartdao.model.Page;
 import org.september.smartdao.model.ParamMap;
 import org.september.smartdao.model.QueryPair;
+import org.september.smartdao.util.DMSqlHelper;
 import org.september.smartdao.util.ReflectHelper;
 import org.september.smartdao.util.SqlHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,10 +36,20 @@ public class CommonDao {
 
 	public CommonDao() {
 		CommonDaoHolder.dao = this;
+		if("mysql".equals(SmartDatasourceHolder.srds.getDialect())){
+			sqlHelper = new SqlHelper();
+		}else if("dm".equals(SmartDatasourceHolder.srds.getDialect())){
+			sqlHelper = new DMSqlHelper();
+		}
 	}
+	
+	@Autowired(required=false)
+	FieldDataConverter fieldDataConverter;
 	
 	@Autowired
 	SqlSessionTemplate sqlSessionTemplate;
+	
+	private SqlHelper sqlHelper;
 
 	/**
 	 * @author yexinzhou
@@ -50,13 +62,13 @@ public class CommonDao {
 				throw new BusinessException("tablename should not be empty!");
 			}
 			SmartDatasourceHolder.switchToWrite();
-			List<QueryPair> queryPairList = SqlHelper.getQueryPairs(entity,true);
+			List<QueryPair> queryPairList = sqlHelper.getQueryPairs(entity,true);
 			ParamMap pm = new ParamMap();
 			pm.put("columnList", queryPairList);
 			pm.put("tableName", tableName);
-			String keyName = SqlHelper.getIdOfClass(entity.getClass()).getName();
-			Sequence seq = SqlHelper.getIdOfClass(entity.getClass()).getAnnotation(Sequence.class);
-			AutoIncrease auto = SqlHelper.getIdOfClass(entity.getClass()).getAnnotation(AutoIncrease.class);
+			String keyName = sqlHelper.getIdOfClass(entity.getClass()).getName();
+			Sequence seq = sqlHelper.getIdOfClass(entity.getClass()).getAnnotation(Sequence.class);
+			AutoIncrease auto = sqlHelper.getIdOfClass(entity.getClass()).getAnnotation(AutoIncrease.class);
 			if (seq != null) {
 				pm.put("selectKey", seq.selectKey());
 				sqlSessionTemplate.insert("CommonEntityMapper.insertEntityWithSequence", pm);
@@ -68,11 +80,15 @@ public class CommonDao {
 					sqlSessionTemplate.insert("CommonEntityMapper.insertEntityAutoIncrease", pm);
 				}else if(ds.getUrl().contains("sqlserver")) {
 					sqlSessionTemplate.insert("CommonEntityMapper.insertMSEntityAutoIncrease", pm);
+				}else if(ds.getUrl().contains("dm")) {
+					sqlSessionTemplate.insert("CommonEntityMapper.insertEntityAutoIncrease", pm);
+				}else {
+					throw new BusinessException("不支持的数据量类型");
 				}
 				long id = (long) pm.get("id");
 				BeanUtils.setProperty(entity, keyName, id);
 			} else {
-			    Field idField = SqlHelper.getIdOfEntity(entity);
+			    Field idField = sqlHelper.getIdOfEntity(entity);
 			    idField.setAccessible(true);
 			    QueryPair id = new QueryPair();
 			    id.setColumnName(keyName);
@@ -87,14 +103,15 @@ public class CommonDao {
 	}
 	
 	public void save(Object entity) {
-		save(entity,SqlHelper.getTableName(entity.getClass()));
+		save(entity,sqlHelper.getTableName(entity.getClass()));
 	}
 	
 
 	public int update(Object entity) {
-		String tableName = SqlHelper.getTableName(entity.getClass());
+		String tableName = sqlHelper.getTableName(entity.getClass());
 		return update(entity,tableName);
 	}
+	
 	/**
 	 * @author yexinzhou
 	 * @Description:根据id(由注解 @Id 决定 ) 更新entity中不为null的值
@@ -104,7 +121,7 @@ public class CommonDao {
 		try {
 			SmartDatasourceHolder.switchToWrite();
 			// 得到类中属性id
-			Field id = SqlHelper.getIdOfEntity(entity);
+			Field id = sqlHelper.getIdOfEntity(entity);
 			id.setAccessible(true);
 			if (id != null) {
 				Object val = id.get(entity);
@@ -113,7 +130,7 @@ public class CommonDao {
 				}
 				
 				if(StringUtils.isEmpty(tableName)) {
-					tableName = SqlHelper.getTableName(entity.getClass());
+					tableName = sqlHelper.getTableName(entity.getClass());
 				}
 				return this.updateByField(entity.getClass(), id.getName(), val, entity, false,tableName);
 			}
@@ -129,14 +146,14 @@ public class CommonDao {
 		try {
 			SmartDatasourceHolder.switchToWrite();
 			// 得到类中属性id
-			Field id = SqlHelper.getIdOfEntity(entity);
+			Field id = sqlHelper.getIdOfEntity(entity);
 			id.setAccessible(true);
 			if (id != null) {
 				Object val = id.get(entity);
 				if (val == null) {
 					throw new RuntimeException("id can't be null when update");
 				}
-				String tableName = SqlHelper.getTableName(entity.getClass());
+				String tableName = sqlHelper.getTableName(entity.getClass());
 				this.updateByField(entity.getClass(), id.getName(), val, entity, true,tableName);
 			}
 		} catch (IllegalAccessException e) {
@@ -154,8 +171,8 @@ public class CommonDao {
 	public int deleteByIds(Class<?> clazz, List<Object> ids) {
 		SmartDatasourceHolder.switchToWrite();
 		ParamMap pm = new ParamMap();
-		pm.put("idColumn", SqlHelper.getIdColumnOfClass(clazz));
-		pm.put("tableName", SqlHelper.getTableName(clazz));
+		pm.put("idColumn", sqlHelper.getIdColumnOfClass(clazz));
+		pm.put("tableName", sqlHelper.getTableName(clazz));
 		pm.put("ids", ids);
 		return sqlSessionTemplate.delete("CommonEntityMapper.deleteByIds", pm);
 	}
@@ -168,7 +185,7 @@ public class CommonDao {
 	public void delete(Object entity) {
 		SmartDatasourceHolder.switchToWrite();
 		ParamMap pm = new ParamMap();
-		Field id = SqlHelper.getIdOfEntity(entity);
+		Field id = sqlHelper.getIdOfEntity(entity);
 		if (id != null) {
 			Object val = null;
 			try {
@@ -180,12 +197,12 @@ public class CommonDao {
 			if (val == null) {
 				throw new RuntimeException("id can't be null when delete");
 			}
-			pm.put("idColumn", SqlHelper.getIdColumnOfEntity(entity));
+			pm.put("idColumn", sqlHelper.getIdColumnOfEntity(entity));
 			pm.put("idValue", val);
 		} else {
 			throw new RuntimeException("id field not found for class " + entity.getClass());
 		}
-		pm.put("tableName", SqlHelper.getTableName(entity.getClass()));
+		pm.put("tableName", sqlHelper.getTableName(entity.getClass()));
 		sqlSessionTemplate.delete("CommonEntityMapper.deleteById", pm);
 	}
 
@@ -194,10 +211,10 @@ public class CommonDao {
 			return null;
 		}
 		SmartDatasourceHolder.switchToRead();
-		String tableName = SqlHelper.getTableName(clazz);
+		String tableName = sqlHelper.getTableName(clazz);
 		ParamMap pm = new ParamMap();
 		pm.put("tableName", tableName);
-		pm.put("idColumn", SqlHelper.getIdColumnOfClass(clazz));
+		pm.put("idColumn", sqlHelper.getIdColumnOfClass(clazz));
 		pm.put("idValue", id);
 		Map<String, Object> map = sqlSessionTemplate.selectOne("CommonEntityMapper.getById", pm);
 		T result = ReflectHelper.transformMapToEntity(clazz, map);
@@ -222,10 +239,10 @@ public class CommonDao {
 	        return new ArrayList<>();
 	    }
 	    SmartDatasourceHolder.switchToRead();
-        String tableName = SqlHelper.getTableName(clazz);
+        String tableName = sqlHelper.getTableName(clazz);
         ParamMap pm = new ParamMap();
         pm.put("tableName", tableName);
-        pm.put("idColumn", SqlHelper.getIdColumnOfClass(clazz));
+        pm.put("idColumn", sqlHelper.getIdColumnOfClass(clazz));
         pm.put("ids", ids);
         List<Map<String, Object>> mapResult = sqlSessionTemplate.selectList("CommonEntityMapper.listByIds", pm);
         List<?> entityResult = ReflectHelper.transformMapToEntity(clazz, mapResult);
@@ -259,8 +276,8 @@ public class CommonDao {
 	 */
 	public <T> List<T> listByExample(T vo, List<Order> orders) {
 		SmartDatasourceHolder.switchToRead();
-		String tableName = SqlHelper.getTableName(vo.getClass());
-		List<QueryPair> queryPairs = SqlHelper.getQueryPairs(vo);
+		String tableName = sqlHelper.getTableName(vo.getClass());
+		List<QueryPair> queryPairs = sqlHelper.getQueryPairs(vo);
 		ParamMap pm = new ParamMap();
 		pm.put("tableName", tableName);
 		pm.put("queryPairList", queryPairs);
@@ -340,8 +357,8 @@ public class CommonDao {
 	 */
 	public <T> Page<T> findPageByExample(Class<T> clazz, Page<T> page, Object example, List<Order> orders) {
 		SmartDatasourceHolder.switchToRead();
-		String tableName = SqlHelper.getTableName(clazz);
-		List<QueryPair> queryPairs = SqlHelper.getQueryPairs(example);
+		String tableName = sqlHelper.getTableName(clazz);
+		List<QueryPair> queryPairs = sqlHelper.getQueryPairs(example);
 		ParamMap paramMap = new ParamMap();
 		paramMap.put("tableName", tableName);
 		paramMap.put("queryPairList", queryPairs);
@@ -418,7 +435,7 @@ public class CommonDao {
 
 	public <T> int updateByField(Class<T> clazz, String fieldName, Object fieldValue, Object updateObj,
 			boolean updateNull) {
-		String tableName = SqlHelper.getTableName(clazz);
+		String tableName = sqlHelper.getTableName(clazz);
 		return updateByField(clazz,fieldName,fieldValue,updateObj,updateNull,tableName);
 	}
 	/**
@@ -435,18 +452,19 @@ public class CommonDao {
 	 */
 	public <T> int updateByField(Class<T> clazz, String fieldName, Object fieldValue, Object updateObj,
 			boolean updateNull,String tableName) {
-		Field[] fields = SqlHelper.getFieldsWithoutTransient(clazz);
+		Field[] fields = sqlHelper.getFieldsWithoutTransient(clazz);
 		List<Map<String, Object>> columns = new ArrayList<Map<String, Object>>();
 		String whereColumnName = fieldName;
 		String lockFieldName = null;
 		Object lockFieldValue = null;
+		Field versionField=null;
 		for (Field f : fields) {
 			if (f.getName().equals(fieldName)) {
-				whereColumnName = SqlHelper.getColumnName(f);
+				whereColumnName = sqlHelper.getColumnName(f);
 				continue;
 			}
 			Map<String, Object> column = new HashMap<String, Object>();
-			String columnName = SqlHelper.getColumnName(f);
+			String columnName = sqlHelper.getColumnName(f);
 			column.put("name", columnName);
 			f.setAccessible(true);
 			try {
@@ -464,7 +482,8 @@ public class CommonDao {
 				// 判断是否乐观锁
 	            OptimisticLock lockAnno = f.getAnnotation(OptimisticLock.class);
 	            if(lockAnno!=null) {
-	                lockFieldName = f.getName();
+	            	versionField = f;
+	                lockFieldName = sqlHelper.getColumnName(f);
 	                lockFieldValue = value;
 	                continue;
 	            }
@@ -482,6 +501,22 @@ public class CommonDao {
 		pm.put("lockFieldValue", lockFieldValue);
 		
 		int result = this.execute("CommonEntityMapper.updateByField", pm);
+		if(result>0 && versionField!=null) {
+			//更新@OptimisticLock标记的字段。
+			try {
+				Object val = versionField.get(updateObj);
+				if(val instanceof Integer) {
+					versionField.set(updateObj, ((Integer)val)+1);
+				}else if(val instanceof Long) {
+					versionField.set(updateObj, ((Long)val)+1);
+				}else {
+					throw new BusinessException("OptimisticLock does not add to a Integer or Long field");
+				}
+			} catch (Exception e) {
+				throw new BusinessException("更新OptimisticLock标记的字段失败",e);
+			}
+			
+		}
 		return result;
 	}
 
@@ -497,26 +532,26 @@ public class CommonDao {
 		}
 		SmartDatasourceHolder.switchToWrite();
 		ParamMap pm = new ParamMap();
-		Field[] fields = SqlHelper.getFieldsWithoutTransient(clazz);
+		Field[] fields = sqlHelper.getFieldsWithoutTransient(clazz);
 		List<String> columns = new ArrayList<String>();
 		for (int i = 0; i < fields.length; i++) {
-			if (SqlHelper.isAutoInstreaseField(fields[i])) {
+			if (sqlHelper.isAutoInstreaseField(fields[i])) {
 				continue;
 			}
-			columns.add(SqlHelper.getColumnName(fields[i]));
+			columns.add(sqlHelper.getColumnName(fields[i]));
 		}
 		List<List<Object>> rows = new ArrayList<List<Object>>();
 		for (T obj : list) {
 			List<Object> values = getBatchInsertColumnValues(obj);
 			rows.add(values);
 		}
-		pm.put("tableName", SqlHelper.getTableName(clazz));
+		pm.put("tableName", sqlHelper.getTableName(clazz));
 		pm.put("columns", columns);
 		pm.put("rows", rows);
-		if (SqlHelper.isAutoInstreaseField(SqlHelper.getIdOfClass(clazz))) {
+		if (sqlHelper.isAutoInstreaseField(sqlHelper.getIdOfClass(clazz))) {
 			return this.execute("CommonEntityMapper.batchInsertAutoIncrease", pm);
 		} else {
-			Sequence seq = SqlHelper.getIdOfClass(clazz).getAnnotation(Sequence.class);
+			Sequence seq = sqlHelper.getIdOfClass(clazz).getAnnotation(Sequence.class);
 			pm.put("selectKey", seq.selectKey());
 			return this.execute("CommonEntityMapper.batchInsertBySequence", pm);
 		}
@@ -525,13 +560,13 @@ public class CommonDao {
 
 	private List<Object> getBatchInsertColumnValues(Object obj) {
 		List<Object> values = new ArrayList<Object>();
-		Field[] fields = SqlHelper.getFieldsWithoutTransient(obj.getClass());
+		Field[] fields = sqlHelper.getFieldsWithoutTransient(obj.getClass());
 
 		for (int i = 0; i < fields.length; i++) {
-			if (SqlHelper.isAutoInstreaseField(fields[i])) {
+			if (sqlHelper.isAutoInstreaseField(fields[i])) {
 				continue;
 			}
-			if (SqlHelper.isIdField(fields[i])) {
+			if (sqlHelper.isIdField(fields[i])) {
 				// 根据序列获取id
 				Field idField = fields[i];
 				Sequence seqAno = idField.getAnnotation(Sequence.class);
@@ -564,14 +599,13 @@ public class CommonDao {
 		return values;
 	}
 
-	public int countByExample(Object vo) {
+	public int countByExample(Object vo,String tableName) {
 		SmartDatasourceHolder.switchToRead();
-		String tableName = SqlHelper.getTableName(vo.getClass());
-		Field[] fields = SqlHelper.getFieldsWithoutTransient(vo.getClass());
+		Field[] fields = sqlHelper.getFieldsWithoutTransient(vo.getClass());
 		List<Map<String, Object>> columns = new ArrayList<Map<String, Object>>();
 		for (Field f : fields) {
 			Map<String, Object> column = new HashMap<String, Object>();
-			String columnName = SqlHelper.getColumnName(f);
+			String columnName = sqlHelper.getColumnName(f);
 			column.put("name", columnName);
 			f.setAccessible(true);
 			try {
@@ -596,9 +630,22 @@ public class CommonDao {
 		return result.intValue();
 	}
 
+	public int countByExample(Object vo) {
+		String tableName = sqlHelper.getTableName(vo.getClass());
+		return countByExample(vo,tableName);
+	}
 	public int count(String statment, ParamMap pm) {
 		Map<String, Object> map = findOne(statment , pm);
 		long total = (long)map.get("total");
 		return (int)total;
 	}
+
+	public SqlHelper getSqlHelper() {
+		return sqlHelper;
+	}
+
+	public FieldDataConverter getFieldDataConverter() {
+		return fieldDataConverter;
+	}
+	
 }

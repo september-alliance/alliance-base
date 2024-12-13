@@ -171,9 +171,9 @@ public class SmartSqlTest {
 	 */
 	@Test
 	public void testListByExampleInCommonDao() {
-		String idColumn = SqlHelper.getIdColumnOfClass(Book.class);
+		String idColumn = commonDao.getSqlHelper().getIdColumnOfClass(Book.class);
 		Field[] declaredFields = Book.class.getDeclaredFields();
-		String columnName = SqlHelper.getColumnName(declaredFields[2]);
+		String columnName = commonDao.getSqlHelper().getColumnName(declaredFields[2]);
 		Direction direction1 = Direction.fromString("asc");
 		Direction direction2 = Direction.fromString("desc");
 		Order order1=new Order(idColumn,direction1);
@@ -194,10 +194,10 @@ public class SmartSqlTest {
 	@Test
 	public void testListByParamsInCommonDao() {
 		// test 目录下架mapper文件
-		String tableName = SqlHelper.getTableName(Book.class);
+		String tableName = commonDao.getSqlHelper().getTableName(Book.class);
 		ParamMap pm = new ParamMap();
 		pm.put("tableName", tableName);
-		pm.put("idColumn", SqlHelper.getIdColumnOfClass(Book.class));
+		pm.put("idColumn", commonDao.getSqlHelper().getIdColumnOfClass(Book.class));
 		pm.put("idValue", 15);
 		List<Map<String, Object>> results = commonDao.listByParams("CommonEntityMapper.getById", pm);
 		System.out.println(results.get(0));
@@ -210,10 +210,10 @@ public class SmartSqlTest {
 	 */
 	@Test
 	public void testFindOneInCommonDao() {
-		String tableName = SqlHelper.getTableName(Book.class);
+		String tableName = commonDao.getSqlHelper().getTableName(Book.class);
 		ParamMap pm = new ParamMap();
 		pm.put("tableName", tableName);
-		pm.put("idColumn", SqlHelper.getIdColumnOfClass(Book.class));
+		pm.put("idColumn", commonDao.getSqlHelper().getIdColumnOfClass(Book.class));
 		pm.put("idValue", 15);
 		Map<String, Object> result = commonDao.findOne("CommonEntityMapper.getById", pm);
 		System.out.println(result);
@@ -242,9 +242,9 @@ public class SmartSqlTest {
 	 */
 	@Test
 	public void testFindPageByParamsInCommonDao() {
-		String tableName = SqlHelper.getTableName(Book.class);
+		String tableName = commonDao.getSqlHelper().getTableName(Book.class);
 		ParamMap pm = new ParamMap();
-		List<QueryPair> queryPairs = SqlHelper.getQueryPairs(new Book());
+		List<QueryPair> queryPairs = commonDao.getSqlHelper().getQueryPairs(new Book());
 		pm.put("tableName", tableName);
 		pm.put("queryPairList", queryPairs);
 		Page<Book> page = new Page<Book>();
@@ -262,9 +262,9 @@ public class SmartSqlTest {
 	 */
 	@Test
 	public void testFindPageByParamsWithMapResultInCommonDao() {
-		List<QueryPair> queryPairs = SqlHelper.getQueryPairs(new Book());
+		List<QueryPair> queryPairs = commonDao.getSqlHelper().getQueryPairs(new Book());
 		ParamMap pm = new ParamMap();
-		pm.put("tableName", SqlHelper.getTableName(Book.class));
+		pm.put("tableName", commonDao.getSqlHelper().getTableName(Book.class));
 		pm.put("queryPairList", queryPairs);
 		Page page = new Page();
 		page.setCurrentPage(1);
@@ -285,8 +285,8 @@ public class SmartSqlTest {
 		ids.add(205);
 		ids.add(206);
 		ParamMap pm = new ParamMap();
-		pm.put("idColumn", SqlHelper.getIdColumnOfClass(Book.class));
-		pm.put("tableName", SqlHelper.getTableName(Book.class));
+		pm.put("idColumn", commonDao.getSqlHelper().getIdColumnOfClass(Book.class));
+		pm.put("tableName", commonDao.getSqlHelper().getTableName(Book.class));
 		pm.put("ids", ids);
 		int result = commonDao.execute("CommonEntityMapper.deleteByIds", pm);
 		System.out.println("result:" + result);
