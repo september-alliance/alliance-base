@@ -27,7 +27,6 @@ public class SqlHelper {
         }
         return tableName.toLowerCase();
     }
-
     public List<QueryPair> getQueryPairs(Object parameterObject) {
     	return getQueryPairs(parameterObject , false);
     }
@@ -222,6 +221,10 @@ public class SqlHelper {
         }
         
         // 使用正则表达式进行转换
-        return input.replaceAll("([a-z])([A-Z])", "$1_$2").toLowerCase();
+        return input.replaceAll("([a-z])([A-Z0-9])", "$1_$2").toLowerCase();
+    }
+    
+    public static void main(String[] args) {
+    	System.out.println(camelToSnake("maxWeightAxel6"));
     }
 }
