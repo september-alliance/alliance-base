@@ -4,10 +4,11 @@ import java.io.Serializable;
 import java.util.Date;
 
 import org.september.smartdao.anno.AutoIncrease;
-import org.september.smartdao.anno.Column;
 import org.september.smartdao.anno.Entity;
 import org.september.smartdao.anno.Id;
-import org.september.smartdao.anno.Table;
+
+import com.gitee.sunchenbin.mybatis.actable.annotation.Column;
+import com.gitee.sunchenbin.mybatis.actable.annotation.Table;
 
 
 @Entity

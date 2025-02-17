@@ -6,12 +6,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.september.smartdao.anno.Column;
 import org.september.smartdao.anno.Id;
-import org.september.smartdao.anno.Table;
 import org.september.smartdao.datasource.SmartDatasourceHolder;
 import org.september.smartdao.model.QueryPair;
 import org.springframework.util.StringUtils;
+
+import com.gitee.sunchenbin.mybatis.actable.annotation.Column;
+import com.gitee.sunchenbin.mybatis.actable.annotation.Table;
 
 
 

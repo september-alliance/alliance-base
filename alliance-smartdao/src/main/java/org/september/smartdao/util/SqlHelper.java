@@ -8,11 +8,12 @@ import java.util.Map;
 
 import org.september.core.component.log.LogHelper;
 import org.september.smartdao.anno.AutoIncrease;
-import org.september.smartdao.anno.Column;
 import org.september.smartdao.anno.Id;
 import org.september.smartdao.anno.IntegerDefaultValue;
-import org.september.smartdao.anno.Table;
 import org.september.smartdao.model.QueryPair;
+
+import com.gitee.sunchenbin.mybatis.actable.annotation.Column;
+import com.gitee.sunchenbin.mybatis.actable.annotation.Table;
 
 
 public class SqlHelper {
