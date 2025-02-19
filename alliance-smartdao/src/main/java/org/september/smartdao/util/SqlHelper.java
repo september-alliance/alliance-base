@@ -25,6 +25,9 @@ public class SqlHelper {
         Table tableAno = clazz.getAnnotation(Table.class);
         if (tableAno != null) {
             tableName = tableAno.name();
+            if(tableName==null || "".equals(tableName)) {
+            	tableName = tableAno.value();
+            }
         }
         return tableName.toLowerCase();
     }
