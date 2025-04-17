@@ -29,106 +29,101 @@ import jakarta.validation.ValidationException;
 
 @ControllerAdvice
 public class DefaultExceptionHandler {
-	
-	protected final static LogHelper logger = LogHelper.getLogger(DefaultExceptionHandler.class);
-	
-    /**
-     * 400 - Bad Request
-     */
-	@ResponseBody
-    @ExceptionHandler(BindException.class)
-    public ResponseVo<String> handleBindException(BindException e) {
-    	logger.getBuilder().warn("参数格式错误",e);
-    	ResponseVo<String> resp = ResponseVo.<String>BUILDER().setCode(ResponseVo.BUSINESS_CODE.FAILED).setErrorType(ResponseVo.Error_Type.Args_Not_Valid);
-        resp.setDesc("参数格式错误");
-    	BindingResult result = e.getBindingResult();
-        for(FieldError error : result.getFieldErrors()) {
-        	ArgError err = new ArgError();
-        	err.setField(error.getField());
-        	err.setMessage(error.getDefaultMessage());
-        	resp.getArgErrors().add(err);
-        }
-        return  resp;
-    }
- 
-    /**
-     * 400 - Bad Request
-     */
-	@ResponseBody
-    @ExceptionHandler(ValidationException.class)
-    public ResponseVo<String> handleValidationException(ValidationException e) {
-    	logger.getBuilder().warn("参数验证错误",e);
-    	return ResponseVo.<String>BUILDER().setCode(ResponseVo.BUSINESS_CODE.FAILED).setErrorType(Error_Type.Business_Exception).setDesc("参数验证异常");
-    }
- 
-    /**
-     * 业务层需要自己声明异常的情况
-     */
-	@ResponseBody
-    @ExceptionHandler(BusinessException.class)
-    public ResponseVo<String> handleServiceException(BusinessException e) {
-    	logger.getBuilder().warn("业务系统异常",e);
-    	int code = ResponseVo.BUSINESS_CODE.FAILED;
-    	if(!StringUtils.isEmpty(e.getCode())) {
-    	    code = Integer.parseInt(e.getCode());
-    	}
-    	return ResponseVo.<String>BUILDER().setCode(code).setErrorType(Error_Type.Business_Exception).setDesc(e.getMessage());
-    }
- 
-    /**
-     * 获取其它异常。包括500
-     * @param e
-     * @return
-     * @throws Exception
-     */
-   @ExceptionHandler(value = Exception.class)
-    public ModelAndView defaultErrorHandler(Exception e , HttpServletRequest request, HttpServletResponse response ){
-	   logger.getBuilder().warn("系统内部异常",e);
-	   HandlerMethod handlerMethod = null;
-	   Map<String, Object> pathVariables = (Map<String, Object>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
-	   if(request.getAttribute(HandlerMapping.BEST_MATCHING_HANDLER_ATTRIBUTE) instanceof HandlerMethod) {
-		   handlerMethod = (HandlerMethod) request.getAttribute(HandlerMapping.BEST_MATCHING_HANDLER_ATTRIBUTE);
-	   }
-       boolean isXhr=false;
-       if(handlerMethod!=null) {
-    	   ResponseBody anno = handlerMethod.getMethodAnnotation(ResponseBody.class);
-	         if(anno!=null){
-	         isXhr = true;
-	     }
-       }
 
-       if(isXhr) {
-    	   ResponseVo<String> respVo = ResponseVo.<String>BUILDER().setCode(ResponseVo.BUSINESS_CODE.FAILED).setErrorType(Error_Type.UnExpect_Exception).setDesc(e.getMessage());
-    	   responseAjax(response , respVo);
-    	   return null;
-       }else {
-    	   ModelAndView modelAndView = new ModelAndView();
-    	   if(e instanceof NoResourceFoundException) {
-    		   modelAndView.setViewName("404");
-    	   }else if(e instanceof NotAuthorizedException) {
-    		   modelAndView.setViewName("503");
-    	   }else {
-    		   modelAndView.setViewName("500");
-    	   }
-           modelAndView.addObject("desc", e.getMessage());
-           return modelAndView;
-       }
-    }
-   
-   public static void responseAjax(HttpServletResponse response, Object responseVo) {
-       try {
-           String result = JSON.toJSONString(responseVo);
-           response.setHeader("Content-Type", "application/json;charset=UTF-8");
-           response.getOutputStream().write(result.getBytes("UTF-8"));
-           response.getOutputStream().flush();
-       } catch (IOException e) {
-       	logger.getBuilder().error("Ajax返回值异常", e);
-       } finally {
-           try {
-               response.getOutputStream().close();
-           } catch (IOException e) {
-           	logger.getBuilder().error("写流关闭失败", e);
-           }
-       }
-   }
+	protected final static LogHelper logger = LogHelper.getLogger(DefaultExceptionHandler.class);
+
+	/**
+	 * 400 - Bad Request
+	 */
+	@ResponseBody
+	@ExceptionHandler(BindException.class)
+	public ResponseVo<String> handleBindException(BindException e) {
+		logger.getBuilder().warn("参数格式错误", e);
+		ResponseVo<String> resp = ResponseVo.<String>BUILDER().setCode(ResponseVo.BUSINESS_CODE.FAILED)
+				.setErrorType(ResponseVo.Error_Type.Args_Not_Valid);
+		resp.setDesc("参数格式错误");
+		BindingResult result = e.getBindingResult();
+		for (FieldError error : result.getFieldErrors()) {
+			ArgError err = new ArgError();
+			err.setField(error.getField());
+			err.setMessage(error.getDefaultMessage());
+			resp.getArgErrors().add(err);
+		}
+		return resp;
+	}
+
+	/**
+	 * 400 - Bad Request
+	 */
+	@ResponseBody
+	@ExceptionHandler(ValidationException.class)
+	public ResponseVo<String> handleValidationException(ValidationException e) {
+		logger.getBuilder().warn("参数验证错误", e);
+		return ResponseVo.<String>BUILDER().setCode(ResponseVo.BUSINESS_CODE.FAILED)
+				.setErrorType(Error_Type.Business_Exception).setDesc("参数验证异常");
+	}
+
+	/**
+	 * 获取其它异常。包括500
+	 * 
+	 * @param e
+	 * @return
+	 * @throws Exception
+	 */
+	@ExceptionHandler(value = Exception.class)
+	public Object defaultErrorHandler(Exception e, HttpServletRequest request, HttpServletResponse response) {
+		HandlerMethod handlerMethod = null;
+		logger.getBuilder().warn("业务系统异常", e);
+//	   Map<String, Object> pathVariables = (Map<String, Object>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+		if (request.getAttribute(HandlerMapping.BEST_MATCHING_HANDLER_ATTRIBUTE) instanceof HandlerMethod) {
+			handlerMethod = (HandlerMethod) request.getAttribute(HandlerMapping.BEST_MATCHING_HANDLER_ATTRIBUTE);
+		}
+		boolean isXhr = false;
+		if (handlerMethod != null) {
+			ResponseBody anno = handlerMethod.getMethodAnnotation(ResponseBody.class);
+			if (anno != null) {
+				isXhr = true;
+			}
+		}
+		if (isXhr) {
+			if (e instanceof BusinessException) {
+				ResponseVo<String> respVo = ResponseVo.<String>BUILDER().setCode(ResponseVo.BUSINESS_CODE.FAILED)
+						.setErrorType(Error_Type.Business_Exception).setDesc(e.getMessage());
+				responseAjax(response, respVo);
+			}else {
+				ResponseVo<String> respVo = ResponseVo.<String>BUILDER().setCode(ResponseVo.BUSINESS_CODE.FAILED)
+						.setErrorType(Error_Type.UnExpect_Exception).setDesc(e.getMessage());
+				responseAjax(response, respVo);
+			}
+			return null;
+		} else {
+			ModelAndView modelAndView = new ModelAndView();
+			if (e instanceof NoResourceFoundException) {
+				modelAndView.setViewName("404");
+			} else if (e instanceof NotAuthorizedException) {
+				modelAndView.setViewName("503");
+			} else {
+				modelAndView.setViewName("500");
+			}
+			modelAndView.addObject("desc", e.getMessage());
+			return modelAndView;
+		}
+	}
+
+	public static void responseAjax(HttpServletResponse response, Object responseVo) {
+		try {
+			String result = JSON.toJSONString(responseVo);
+			response.setHeader("Content-Type", "application/json;charset=UTF-8");
+			response.getOutputStream().write(result.getBytes("UTF-8"));
+			response.getOutputStream().flush();
+		} catch (IOException e) {
+			logger.getBuilder().error("Ajax返回值异常", e);
+		} finally {
+			try {
+				response.getOutputStream().close();
+			} catch (IOException e) {
+				logger.getBuilder().error("写流关闭失败", e);
+			}
+		}
+	}
 }
