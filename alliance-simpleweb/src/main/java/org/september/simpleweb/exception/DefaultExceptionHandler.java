@@ -16,6 +16,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.ModelAndView;
@@ -80,8 +81,9 @@ public class DefaultExceptionHandler {
 		}
 		boolean isXhr = false;
 		if (handlerMethod != null) {
+			RestController restAnno = handlerMethod.getBeanType().getAnnotation(RestController.class);
 			ResponseBody anno = handlerMethod.getMethodAnnotation(ResponseBody.class);
-			if (anno != null) {
+			if (restAnno!=null || anno != null) {
 				isXhr = true;
 			}
 		}
