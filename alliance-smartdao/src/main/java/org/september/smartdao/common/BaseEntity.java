@@ -50,7 +50,7 @@ public abstract class BaseEntity {
     
     
     @OptimisticLock
-    @Column(name = "data_version", type = MySqlTypeConstant.INT, length = 6, isNull = false)
+    @Column(name = "data_version", type = MySqlTypeConstant.INT, length = 6, defaultValue = "0", isNull = false)
     @DefaultValue("0")
     protected Integer dataVersion;
 
