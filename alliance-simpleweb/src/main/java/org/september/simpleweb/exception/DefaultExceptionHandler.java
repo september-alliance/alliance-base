@@ -63,6 +63,12 @@ public class DefaultExceptionHandler {
 		return ResponseVo.<String>BUILDER().setCode(ResponseVo.BUSINESS_CODE.FAILED)
 				.setErrorType(Error_Type.Business_Exception).setDesc("参数验证异常");
 	}
+	
+	@ExceptionHandler(NoResourceFoundException.class)
+	public Object handleNoResourceFoundException(NoResourceFoundException e) {
+		return "/404";
+	}
+	
 
 	/**
 	 * 获取其它异常。包括500
