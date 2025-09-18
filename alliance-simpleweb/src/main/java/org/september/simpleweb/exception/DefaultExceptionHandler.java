@@ -130,7 +130,7 @@ public class DefaultExceptionHandler {
 			try {
 				response.getOutputStream().close();
 			} catch (IOException e) {
-				logger.getBuilder().error("写流关闭失败", e);
+				logger.getBuilder().error("写流关闭失败");
 			}
 		}
 	}
