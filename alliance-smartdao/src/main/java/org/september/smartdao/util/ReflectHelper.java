@@ -122,6 +122,9 @@ public class ReflectHelper {
                 	}else {
                 		field.set(dest, v);
                 	}
+                }else if (value instanceof Byte) {
+                	Byte bVal = (Byte)value;
+                    field.set(dest, bVal.intValue());
                 }
                 else {
                     field.set(dest, value);
